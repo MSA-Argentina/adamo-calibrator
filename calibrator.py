@@ -1,4 +1,5 @@
 from xinput import XInput
+from random import randint
 
 
 class Calibrator:
@@ -15,6 +16,8 @@ class Calibrator:
         self.blocks = 8
         self.nclicks = 0
         self.clicks = []
+        self.points = []
+        self.points_clicked = []
 
     def set_screen_prop(self, width, height):
         self.width = width
@@ -23,18 +26,28 @@ class Calibrator:
         self.delta_x = width / self.blocks
         self.delta_y = height / self.blocks
 
+        self.points = [(self.delta_x, self.delta_y),
+                       (self.delta_x, self.delta_y * 7),
+                       #(self.delta_x * 4, self.delta_y * 4),
+                       (self.delta_x * 7, self.delta_y),
+                       (self.delta_x * 7, self.delta_y * 7)]
+
     def calc_new_axis(self, old_xmin, old_xmax, old_ymin, old_ymax):
-        clicks = self.clicks
+        clicks_x = [x for x, y in self.clicks]
+        clicks_y = [y for x, y in self.clicks]
+        clicks_x.sort()
+        clicks_y.sort()
+
         delta_x = self.delta_x
         delta_y = self.delta_y
 
         scale_x = (old_xmax - old_xmin) * 1.0 / self.width
         scale_y = (old_ymax - old_ymin) * 1.0 / self.height
 
-        self.x_min = int((clicks[0][0] + clicks[2][0])/2 * scale_x) - delta_x
-        self.x_max = int((clicks[1][0] + clicks[3][0])/2 * scale_x) + delta_x
-        self.y_min = int((clicks[0][1] + clicks[1][1])/2 * scale_y) - delta_y
-        self.y_max = int((clicks[2][1] + clicks[3][1])/2 * scale_y) + delta_y
+        self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x)
+        self.x_max = int(((clicks_x[2] + clicks_x[3])/2 + delta_x) * scale_x)
+        self.y_min = int(((clicks_y[0] + clicks_y[1])/2 - delta_y) * scale_y)
+        self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y)
 
     def doubleclick(self, x, y):
         for (xc, yc) in self.clicks:
@@ -44,20 +57,34 @@ class Calibrator:
         return False
 
     def misclick(self, x, y, xe, ye):
-        if (abs(x - xe) < self.threshold_misclick and
-                abs(y - ye) < self.threshold_misclick):
+        if (abs(x - xe) > self.threshold_misclick or
+                abs(y - ye) > self.threshold_misclick):
             return True
         return False
 
     def add_click(self, click):
         (x, y) = click
-        #Implementar misclick, pero hay que calcular el esperado
-        if not self.doubleclick(x, y):
-            self.clicks.append((x, y))
-            self.nclicks += 1
-            print 'Click added X: ', x, 'Y: ', y
-        else:
+        (xp, yp) = self.points_clicked[-1]
+        error = None
+        if self.doubleclick(x, y):
+            print 'doble click detected X: ', x, 'Y: ', y
+            error = 'doubleclick'
+        elif self.misclick(x, y, xp, yp):
             print 'Misclick detected X: ', x, 'Y: ', y
+            print 'Expectated X:', xp, 'Y:', yp
+            error = 'misclick'
+        else:
+            self.clicks.append((x, y))
+            print 'Click added X: ', x, 'Y: ', y
+        return error
+
+    def get_next_point(self):
+        if len(self.points) > 0:
+            point = self.points.pop(randint(0, len(self.points) - 1))
+            self.points_clicked.append(point)
+        else:
+            point = None
+        return point
 
     def get_device(self):
         #TODO:
