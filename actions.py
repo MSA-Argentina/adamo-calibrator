@@ -5,26 +5,13 @@ from settings import DEBUG
 class CalibratorControllerActions(BaseActionController):
     """Actions for calibrator controller"""
 
-    def init(self, data):
-        print data
-
-    def document_ready(self):
-        pass
-
     def initiate(self, data):
-        print data
-
-    def next_point(self):
-        pass
+        self.log(data)
+        self.controller.set_resolution(data)
 
     def click(self, data):
-        print data
-
-    def misclick_error(self):
-        pass
-
-    def duplicate_click_error(self):
-        pass
+        self.log(data)
+        self.controller.register_click(data)
 
     def log(self, data):
         """Action executed when 'log' is called and debug is True."""
