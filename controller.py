@@ -22,7 +22,7 @@ class CalibratorController(WebContainerController):
         self.send_command('ready')
 
     def finish(self):
-        self.calibrator.calc_new_axis(0, 2047, 0, 2047)
+        self.calibrator.calc_new_axis()
         self.calibrator.finish()
 
     def register_click(self, data):
