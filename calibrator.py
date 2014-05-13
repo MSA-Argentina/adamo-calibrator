@@ -7,7 +7,6 @@ class Calibrator:
     def __init__(self, npoints, threshold_misclick, threshold_doubleclick):
         self.width = None
         self.height = None
-        self.device = None
 
         self.npoints = npoints
         self.threshold_misclick = threshold_misclick
@@ -19,6 +18,13 @@ class Calibrator:
         self.points = []
         self.points_clicked = []
         self.swapxy = False
+        self.inversex = False
+        self.inversey = False
+
+        xinput = XInput()
+        self.devices = xinput.get_device_with_prop('Evdev Axis Calibration')
+        self.old_prop_value = xinput.get_prop(self.devices[0],
+                                              'Evdev Axis Calibration')
 
     def set_screen_prop(self, width, height):
         self.width = width
@@ -33,7 +39,12 @@ class Calibrator:
                        (self.delta_x * 7, self.delta_y),
                        (self.delta_x * 7, self.delta_y * 7)]
 
-    def calc_new_axis(self, old_xmin, old_xmax, old_ymin, old_ymax):
+    def calc_new_axis(self):
+        old_xmin = int(self.old_prop_value[0])
+        old_xmax = int(self.old_prop_value[1])
+        old_ymin = int(self.old_prop_value[2])
+        old_ymax = int(self.old_prop_value[3])
+
         clicks_x = [x for x, y in self.clicks]
         clicks_y = [y for x, y in self.clicks]
         clicks_x.sort()
@@ -74,6 +85,20 @@ class Calibrator:
 
         return misclick
 
+    def calc_quadrant(self, x, y):
+        width = self.width
+        height = self.height
+        if (x - width / 2) > 0 and (y - height / 2) < 0:
+            quadrant = 1
+        elif (x - width / 2) < 0 and (y - height / 2) < 0:
+            quadrant = 2
+        elif (x - width / 2) < 0 and (y - height / 2) > 0:
+            quadrant = 3
+        elif (x - width / 2) > 0 and (y - height / 2) > 0:
+            quadrant = 4
+
+        return quadrant
+
     def add_click(self, click):
         (x, y) = click
         (xp, yp) = self.points_clicked[-1]
@@ -85,6 +110,24 @@ class Calibrator:
         else:
             self.clicks.append((x, y))
             self.nclicks += 1
+            quadrant_exp = self.calc_quadrant(xp, yp)
+            quadrant = self.calc_quadrant(x, y)
+            if (quadrant == 1 and quadrant_exp == 2) or \
+                    (quadrant == 2 and quadrant_exp == 1) or \
+                    (quadrant == 3 and quadrant_exp == 4) or \
+                    (quadrant == 4 and quadrant_exp == 3):
+                self.inversex = True
+            elif (quadrant == 1 and quadrant_exp == 3) or \
+                    (quadrant == 3 and quadrant_exp == 1) or \
+                    (quadrant == 2 and quadrant_exp == 4) or \
+                    (quadrant == 4 and quadrant_exp == 2):
+                self.inversey = True
+            elif (quadrant == 1 and quadrant_exp == 4) or \
+                    (quadrant == 4 and quadrant_exp == 1) or \
+                    (quadrant == 2 and quadrant_exp == 3) or \
+                    (quadrant == 3 and quadrant_exp == 2):
+                self.swapxy = True
+
         return error
 
     def get_next_point(self):
@@ -95,29 +138,22 @@ class Calibrator:
             point = None
         return point
 
-    def get_device(self):
-        #TODO:
-        #Esta funcion debe conectarse con la clase xedev que devuelve el id o
-        #el nombre del dispositivo
-        pass
-
-    def get_properties(self):
-        #TODO:
-        #Esta funcion debe conectarse con la clase xedev que devuelve las
-        #configuraciones antiguas
-        pass
-
     def finish(self):
-        #TODO:
-        #Esta funcion debe conectarse con la clase xedev que guarde las
-        #settings
-        if self.swapxy:
-            XInput().set_prop('"Evdev Axis Calibration"', '10',
-                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
-                                                       self.y_min, self.y_max))
-            XInput().set_prop('"Evdev Axes Swap"', '10', '1')
-            XInput().set_prop('"Evdev Axis Inverse"', '10', '0, 1')
+        XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
+                          '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
+                                                   self.y_min, self.y_max))
+        if self.inversex:
+            inversex = 1
         else:
-            XInput().set_prop('"Evdev Axis Calibration"', '10',
-                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
-                                                       self.y_min, self.y_max))
+            inversex = 0
+        if self.inversey:
+            inversey = 1
+        else:
+            inversey = 0
+        if self.swapxy:
+            XInput().set_prop(self.devices[0], '"Evdev Axes Swap"', '1')
+            XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
+                              '{0}, {1}'.format(inversey, inversex))
+        else:
+            XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
+                              '{0}, {1}'.format(inversey, inversex))
