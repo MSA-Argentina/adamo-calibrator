@@ -18,6 +18,7 @@ class Calibrator:
         self.clicks = []
         self.points = []
         self.points_clicked = []
+        self.swapxy = False
 
     def set_screen_prop(self, width, height):
         self.width = width
@@ -44,38 +45,46 @@ class Calibrator:
         scale_x = (old_xmax - old_xmin) * 1.0 / self.width
         scale_y = (old_ymax - old_ymin) * 1.0 / self.height
 
+        if (max(clicks_x) - min(clicks_x)) < (max(clicks_y) - min(clicks_y)):
+            self.swapxy = True
+
         self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x)
         self.x_max = int(((clicks_x[2] + clicks_x[3])/2 + delta_x) * scale_x)
         self.y_min = int(((clicks_y[0] + clicks_y[1])/2 - delta_y) * scale_y)
         self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y)
 
     def doubleclick(self, x, y):
+        doubleclick = False
         for (xc, yc) in self.clicks:
             if (abs(x - xc) < self.threshold_misclick and
                     abs(y - yc) < self.threshold_misclick):
-                return True
-        return False
+                doubleclick = True
+        return doubleclick
 
     def misclick(self, x, y, xe, ye):
-        if (abs(x - xe) > self.threshold_misclick or
-                abs(y - ye) > self.threshold_misclick):
-            return True
-        return False
+        misclick = False
+        nclicks = self.nclicks
+        if nclicks > 0:
+            if nclicks == 1:
+                pass
+            elif nclicks == 2:
+                pass
+            elif nclicks == 3:
+                pass
+
+        return misclick
 
     def add_click(self, click):
         (x, y) = click
         (xp, yp) = self.points_clicked[-1]
         error = None
         if self.doubleclick(x, y):
-            print 'doble click detected X: ', x, 'Y: ', y
             error = 'doubleclick'
         elif self.misclick(x, y, xp, yp):
-            print 'Misclick detected X: ', x, 'Y: ', y
-            print 'Expectated X:', xp, 'Y:', yp
             error = 'misclick'
         else:
             self.clicks.append((x, y))
-            print 'Click added X: ', x, 'Y: ', y
+            self.nclicks += 1
         return error
 
     def get_next_point(self):
@@ -102,7 +111,13 @@ class Calibrator:
         #TODO:
         #Esta funcion debe conectarse con la clase xedev que guarde las
         #settings
-        XInput().set_prop('"Evdev Axis Calibration"', '10', [str(self.x_min),
-                                                             str(self.x_max),
-                                                             str(self.y_min),
-                                                             str(self.y_max)])
+        if self.swapxy:
+            XInput().set_prop('"Evdev Axis Calibration"', '10',
+                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
+                                                       self.y_min, self.y_max))
+            XInput().set_prop('"Evdev Axes Swap"', '10', '1')
+            XInput().set_prop('"Evdev Axis Inverse"', '10', '0, 1')
+        else:
+            XInput().set_prop('"Evdev Axis Calibration"', '10',
+                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
+                                                       self.y_min, self.y_max))
