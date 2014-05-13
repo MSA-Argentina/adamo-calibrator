@@ -35,7 +35,6 @@ class Calibrator:
 
         self.points = [(self.delta_x, self.delta_y),
                        (self.delta_x, self.delta_y * 7),
-                       #(self.delta_x * 4, self.delta_y * 4),
                        (self.delta_x * 7, self.delta_y),
                        (self.delta_x * 7, self.delta_y * 7)]
 
@@ -65,6 +64,8 @@ class Calibrator:
         self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y)
 
     def doubleclick(self, x, y):
+        #TODO:
+        # Check this method
         doubleclick = False
         for (xc, yc) in self.clicks:
             if (abs(x - xc) < self.threshold_misclick and
@@ -73,6 +74,8 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y, xe, ye):
+        #TODO:
+        # Do this method
         misclick = False
         nclicks = self.nclicks
         if nclicks > 0:
@@ -139,21 +142,19 @@ class Calibrator:
         return point
 
     def finish(self):
-        XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
-                          '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
-                                                   self.y_min, self.y_max))
-        if self.inversex:
-            inversex = 1
-        else:
-            inversex = 0
-        if self.inversey:
-            inversey = 1
-        else:
-            inversey = 0
+        inversex = 1 if self.inversex else 0
+        inversey = 1 if self.inversey else 0
+
         if self.swapxy:
             XInput().set_prop(self.devices[0], '"Evdev Axes Swap"', '1')
             XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
                               '{0}, {1}'.format(inversey, inversex))
+            XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
+                              '{0} {1} {2} {3}'.format(self.y_min, self.y_max,
+                                                       self.x_min, self.x_max))
         else:
             XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
-                              '{0}, {1}'.format(inversey, inversex))
+                              '{0}, {1}'.format(inversex, inversey))
+            XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
+                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
+                                                       self.y_min, self.y_max))
