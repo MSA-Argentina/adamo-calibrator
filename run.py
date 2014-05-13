@@ -1,7 +1,7 @@
 try:
     import gtk
 except ImportError:
-    print  "You don't have GTK installed"
+    print "You don't have GTK installed"
 
 import pygtk
 pygtk.require('2.0')
