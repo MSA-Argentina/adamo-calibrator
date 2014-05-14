@@ -11,7 +11,7 @@ class CalibratorController(WebContainerController):
         instance = CalibratorControllerActions(controller=self)
         self.add_processor("calibrator", instance)
 
-        self.calibrator = Calibrator(5, 30, 15)
+        self.calibrator = Calibrator(5, 30, 15, 20)
 
     def ready(self, data):
         next = self.calibrator.get_next_point()

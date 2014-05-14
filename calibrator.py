@@ -4,7 +4,8 @@ from random import randint
 
 class Calibrator:
 
-    def __init__(self, npoints, threshold_misclick, threshold_doubleclick):
+    def __init__(self, npoints, threshold_misclick, threshold_doubleclick,
+                 delta_f):
         self.width = None
         self.height = None
 
@@ -21,6 +22,12 @@ class Calibrator:
         self.inversex = False
         self.inversey = False
 
+        self.delta_x = None
+        self.delta_y = None
+        self.delta_f = delta_f
+
+        #TODO:
+        #Create error for xinput handler.
         xinput = XInput()
         self.devices = xinput.get_device_with_prop('Evdev Axis Calibration')
         self.old_prop_value = xinput.get_prop(self.devices[0],
@@ -49,19 +56,22 @@ class Calibrator:
         clicks_x.sort()
         clicks_y.sort()
 
-        delta_x = self.delta_x
-        delta_y = self.delta_y
-
         scale_x = (old_xmax - old_xmin) * 1.0 / self.width
         scale_y = (old_ymax - old_ymin) * 1.0 / self.height
 
-        if (max(clicks_x) - min(clicks_x)) < (max(clicks_y) - min(clicks_y)):
-            self.swapxy = True
+        delta_x = self.delta_x
+        delta_y = self.delta_y
+        delta_fx = self.delta_f * scale_y
+        delta_fy = self.delta_f * scale_x
 
-        self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x)
-        self.x_max = int(((clicks_x[2] + clicks_x[3])/2 + delta_x) * scale_x)
-        self.y_min = int(((clicks_y[0] + clicks_y[1])/2 - delta_y) * scale_y)
-        self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y)
+        self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x) \
+            + delta_fx
+        self.x_max = int(((clicks_x[2] + clicks_x[3])/2 + delta_x) * scale_x) \
+            - delta_fx
+        self.y_min = int(((clicks_y[0] + clicks_y[1])/2 - delta_y) * scale_y) \
+            + delta_fy
+        self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y) \
+            - delta_fy
 
     def doubleclick(self, x, y):
         #TODO:
@@ -88,19 +98,35 @@ class Calibrator:
 
         return misclick
 
-    def calc_quadrant(self, x, y):
-        width = self.width
-        height = self.height
-        if (x - width / 2) > 0 and (y - height / 2) < 0:
-            quadrant = 1
-        elif (x - width / 2) < 0 and (y - height / 2) < 0:
-            quadrant = 2
-        elif (x - width / 2) < 0 and (y - height / 2) > 0:
-            quadrant = 3
-        elif (x - width / 2) > 0 and (y - height / 2) > 0:
-            quadrant = 4
+    def check_axis(self, x, y, xp, yp):
+        def calc_quadrant(w, h, x, y):
+            if (x - w / 2) > 0 and (y - h / 2) < 0:
+                quadrant = 1
+            elif (x - w / 2) < 0 and (y - h / 2) < 0:
+                quadrant = 2
+            elif (x - w / 2) < 0 and (y - h / 2) > 0:
+                quadrant = 3
+            elif (x - w / 2) > 0 and (y - h / 2) > 0:
+                quadrant = 4
+            return quadrant
 
-        return quadrant
+        quadrant_exp = calc_quadrant(self.width, self.height, xp, yp)
+        quadrant = calc_quadrant(self.width, self.height, x, y)
+        if (quadrant == 1 and quadrant_exp == 2) or \
+                (quadrant == 2 and quadrant_exp == 1) or \
+                (quadrant == 3 and quadrant_exp == 4) or \
+                (quadrant == 4 and quadrant_exp == 3):
+            self.inversex = True
+        elif (quadrant == 1 and quadrant_exp == 3) or \
+                (quadrant == 3 and quadrant_exp == 1) or \
+                (quadrant == 2 and quadrant_exp == 4) or \
+                (quadrant == 4 and quadrant_exp == 2):
+            self.inversey = True
+        elif (quadrant == 1 and quadrant_exp == 4) or \
+                (quadrant == 4 and quadrant_exp == 1) or \
+                (quadrant == 2 and quadrant_exp == 3) or \
+                (quadrant == 3 and quadrant_exp == 2):
+            self.swapxy = True
 
     def add_click(self, click):
         (x, y) = click
@@ -113,24 +139,7 @@ class Calibrator:
         else:
             self.clicks.append((x, y))
             self.nclicks += 1
-            quadrant_exp = self.calc_quadrant(xp, yp)
-            quadrant = self.calc_quadrant(x, y)
-            if (quadrant == 1 and quadrant_exp == 2) or \
-                    (quadrant == 2 and quadrant_exp == 1) or \
-                    (quadrant == 3 and quadrant_exp == 4) or \
-                    (quadrant == 4 and quadrant_exp == 3):
-                self.inversex = True
-            elif (quadrant == 1 and quadrant_exp == 3) or \
-                    (quadrant == 3 and quadrant_exp == 1) or \
-                    (quadrant == 2 and quadrant_exp == 4) or \
-                    (quadrant == 4 and quadrant_exp == 2):
-                self.inversey = True
-            elif (quadrant == 1 and quadrant_exp == 4) or \
-                    (quadrant == 4 and quadrant_exp == 1) or \
-                    (quadrant == 2 and quadrant_exp == 3) or \
-                    (quadrant == 3 and quadrant_exp == 2):
-                self.swapxy = True
-
+            self.check_axis(x, y, xp, yp)
         return error
 
     def get_next_point(self):
