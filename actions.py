@@ -6,11 +6,9 @@ class CalibratorControllerActions(BaseActionController):
     """Actions for calibrator controller"""
 
     def initiate(self, data):
-        self.log(data)
         self.controller.set_resolution(data)
 
     def click(self, data):
-        self.log(data)
         self.controller.register_click(data)
 
     def log(self, data):

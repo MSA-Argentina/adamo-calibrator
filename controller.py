@@ -19,6 +19,7 @@ class CalibratorController(WebContainerController):
 
     def set_resolution(self, data):
         self.calibrator.set_screen_prop(data[0], data[1])
+        print "Screen resolution: ", data[1]
         self.send_command('ready')
 
     def finish(self):
@@ -26,8 +27,10 @@ class CalibratorController(WebContainerController):
         self.calibrator.finish()
 
     def register_click(self, data):
+        print "Click detected: ", data
         error = self.calibrator.add_click(data)
         if error is None:
+            print "Click valid: ", data
             next = self.calibrator.get_next_point()
             if next is None:
                 #TODO: Send finish message to frontend
