@@ -29,8 +29,6 @@ class Calibrator:
         self.get_device()
 
     def get_device(self):
-        #TODO:
-        #Create error for xinput handler.
         xinput = XInput()
         devices = xinput.get_device_with_prop('Evdev Axis Calibration')
         if len(devices) == 0:
@@ -170,22 +168,23 @@ class Calibrator:
         return point
 
     def finish(self):
+        xinput = XInput()
         inversex = 1 if self.inversex else 0
         inversey = 1 if self.inversey else 0
 
         if self.swapxy:
-            XInput().set_prop(self.device, '"Evdev Axes Swap"', '1')
+            xinput.set_prop(self.device, '"Evdev Axes Swap"', '1')
 
             if self.inversex or self.inversey:
-                XInput().set_prop(self.device, '"Evdev Axis Inversion"',
-                                  '{0}, {1}'.format(inversey, inversex))
-            XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
-                              '{0} {1} {2} {3}'.format(self.y_min, self.y_max,
-                                                       self.x_min, self.x_max))
+                xinput.set_prop(self.device, '"Evdev Axis Inversion"',
+                                '{0}, {1}'.format(inversey, inversex))
+            xinput.set_prop(self.devices[0], '"Evdev Axis Calibration"',
+                            '{0} {1} {2} {3}'.format(self.y_min, self.y_max,
+                                                     self.x_min, self.x_max))
         else:
             if self.inversex or self.inversey:
-                XInput().set_prop(self.device, '"Evdev Axis Inversion"',
-                                  '{0}, {1}'.format(inversex, inversey))
-            XInput().set_prop(self.device, '"Evdev Axis Calibration"',
-                              '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
-                                                       self.y_min, self.y_max))
+                xinput.set_prop(self.device, '"Evdev Axis Inversion"',
+                                '{0}, {1}'.format(inversex, inversey))
+            xinput.set_prop(self.device, '"Evdev Axis Calibration"',
+                            '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
+                                                     self.y_min, self.y_max))
