@@ -61,7 +61,7 @@ class Calibrator:
 
         delta_x = self.delta_x
         delta_y = self.delta_y
-        delta_fx = self.delta_f * scale_y
+        delta_fx = self.delta_f * scale_x
         delta_fy = self.delta_f * scale_x
 
         self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x) \
@@ -131,6 +131,10 @@ class Calibrator:
                 (quadrant == 2 and quadrant_exp == 3) or \
                 (quadrant == 3 and quadrant_exp == 2):
             self.swapxy = True
+        elif (quadrant == quadrant_exp):
+            self.inversex = False
+            self.inversey = False
+            self.swapxy = False
 
     def add_click(self, click):
         (x, y) = click
@@ -159,14 +163,17 @@ class Calibrator:
 
         if self.swapxy:
             XInput().set_prop(self.devices[0], '"Evdev Axes Swap"', '1')
-            XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
-                              '{0}, {1}'.format(inversey, inversex))
+
+            if self.inversex or self.inversey:
+                XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
+                                  '{0}, {1}'.format(inversey, inversex))
             XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
                               '{0} {1} {2} {3}'.format(self.y_min, self.y_max,
                                                        self.x_min, self.x_max))
         else:
-            XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
-                              '{0}, {1}'.format(inversex, inversey))
+            if self.inversex or self.inversey:
+                XInput().set_prop(self.devices[0], '"Evdev Axis Inversion"',
+                                  '{0}, {1}'.format(inversex, inversey))
             XInput().set_prop(self.devices[0], '"Evdev Axis Calibration"',
                               '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
                                                        self.y_min, self.y_max))
