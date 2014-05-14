@@ -74,8 +74,6 @@ class Calibrator:
             - delta_fy
 
     def doubleclick(self, x, y):
-        #TODO:
-        # Check this method
         doubleclick = False
         for (xc, yc) in self.clicks:
             if (abs(x - xc) < self.threshold_misclick and
@@ -83,22 +81,27 @@ class Calibrator:
                 doubleclick = True
         return doubleclick
 
-    def misclick(self, x, y, xe, ye):
+    def misclick(self, x, y):
+
+        def same_axis(threshold, x, y, xc, yc):
+            same_axis = False
+            if abs(x - xc) < threshold or abs(y - yc) < threshold or \
+                    (abs(x - xc) < threshold and abs(y - yc) < threshold):
+                same_axis = True
+            return same_axis
+
         #TODO:
         # Do this method
         misclick = False
         nclicks = self.nclicks
         if nclicks > 0:
-            if nclicks == 1:
-                pass
-            elif nclicks == 2:
-                pass
-            elif nclicks == 3:
-                pass
-
+            for click in self.clicks:
+                if not same_axis(self.threshold_misclick, x, y, click[0],
+                                 click[1]):
+                    misclick = True
         return misclick
 
-    def check_axis(self, x, y, xp, yp):
+    def check_axis(self, x, y):
         def calc_quadrant(w, h, x, y):
             if (x - w / 2) > 0 and (y - h / 2) < 0:
                 quadrant = 1
@@ -110,6 +113,7 @@ class Calibrator:
                 quadrant = 4
             return quadrant
 
+        (xp, yp) = self.points_clicked[-1]
         quadrant_exp = calc_quadrant(self.width, self.height, xp, yp)
         quadrant = calc_quadrant(self.width, self.height, x, y)
         if (quadrant == 1 and quadrant_exp == 2) or \
@@ -130,16 +134,15 @@ class Calibrator:
 
     def add_click(self, click):
         (x, y) = click
-        (xp, yp) = self.points_clicked[-1]
         error = None
         if self.doubleclick(x, y):
             error = 'doubleclick'
-        elif self.misclick(x, y, xp, yp):
+        elif self.misclick(x, y):
             error = 'misclick'
         else:
             self.clicks.append((x, y))
             self.nclicks += 1
-            self.check_axis(x, y, xp, yp)
+            self.check_axis(x, y)
         return error
 
     def get_next_point(self):
