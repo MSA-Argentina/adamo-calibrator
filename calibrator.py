@@ -24,7 +24,6 @@ class Calibrator:
 
         self.delta_x = None
         self.delta_y = None
-        self.delta_f = delta_f
 
         self.get_device()
 
@@ -119,22 +118,36 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y):
-        def in_zone(threshold, x, y, xc, yc):
-            in_zone = False
-            if (xc - threshold) <= x <= (xc + threshold) and \
-                    (yc - threshold) <= y <= (yc + threshold):
-                in_zone = True
-            return in_zone
+        def same_axis(threshold, x, xp, yp):
+            same_axis = False
+            if abs(x - xp) < threshold or abs(y - yp) < threshold:
+                same_axis = True
+            return same_axis
+
+        def get_adyacent((x, y), points):
+            adyacents = []
+            for point in points:
+                if x == point[0] or y == point[1]:
+                    adyacents.append(point)
+            return adyacents
 
         nclicks = self.nclicks
+        threshold = self.threshold_misclick
+        misclick = False
         if nclicks > 0:
-            misclick = True
-            clicks = self.points + [self.points_clicked[-1]]
-            for click in clicks:
-                if in_zone(self.threshold_misclick, x, y, click[0], click[1]):
-                    misclick = False
-        else:
-            misclick = False
+            dict = {}
+            for i in range(len(self.clicks)):
+                dict[self.points_clicked[i]] = self.clicks[i]
+            point = self.points_clicked[-1]
+            adyacents_points = get_adyacent(point, self.points_clicked[:-1])
+            for adyacent_point in adyacents_points:
+                if adyacent_point in dict:
+                    if not(same_axis(threshold, x, dict[adyacent_point][0],
+                                     dict[adyacent_point][1]) or
+                            same_axis(threshold, y, dict[adyacent_point][0],
+                                      dict[adyacent_point][1])):
+                        misclick = True
+
         return misclick
 
     def check_axis(self, x, y):
@@ -186,9 +199,23 @@ class Calibrator:
         return error
 
     def get_next_point(self):
+        def get_adyacent((x, y), points):
+            adyacents = []
+            for point in points:
+                if x == point[0] or y == point[1]:
+                    adyacents.append(point)
+            return adyacents
+
         if len(self.points) > 0:
-            point = self.points.pop(randint(0, len(self.points) - 1))
-            self.points_clicked.append(point)
+            if len(self.points_clicked) == 0:
+                point = self.points.pop(randint(0, len(self.points) - 1))
+                self.points_clicked.append(point)
+            else:
+                last = self.points_clicked[-1]
+                adyacents = get_adyacent(last, self.points)
+                point = adyacents.pop(randint(0, len(adyacents) - 1))
+                self.points.pop(self.points.index(point))
+                self.points_clicked.append(point)
         else:
             point = None
         return point
