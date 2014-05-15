@@ -119,23 +119,23 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y):
+        def in_zone(threshold, x, y, xc, yc):
+            in_zone = False
+            print "dify", abs(y - yc)
+            if (xc - threshold) <= x <= (xc + threshold) and \
+                    (yc - threshold) <= y <= (yc + threshold):
+                in_zone = True
+            return in_zone
 
-        def same_axis(threshold, x, y, xc, yc):
-            same_axis = False
-            if abs(x - xc) < threshold or abs(y - yc) < threshold or \
-                    (abs(x - xc) < threshold and abs(y - yc) < threshold):
-                same_axis = True
-            return same_axis
-
-        #TODO:
-        # Do this method
-        misclick = False
         nclicks = self.nclicks
         if nclicks > 0:
-            for click in self.clicks:
-                if not same_axis(self.threshold_misclick, x, y, click[0],
-                                 click[1]):
-                    misclick = True
+            misclick = True
+            clicks = self.points + [self.points_clicked[-1]]
+            for click in clicks:
+                if in_zone(self.threshold_misclick, x, y, click[0], click[1]):
+                    misclick = False
+        else:
+            misclick = False
         return misclick
 
     def check_axis(self, x, y):
@@ -178,8 +178,8 @@ class Calibrator:
         error = None
         if self.doubleclick(x, y):
             error = 'doubleclick'
-        #elif self.misclick(x, y):
-        #    error = 'misclick'
+        elif self.misclick(x, y):
+            error = 'misclick'
         else:
             self.clicks.append((x, y))
             self.nclicks += 1
