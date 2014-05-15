@@ -56,6 +56,25 @@ class Calibrator:
                        (self.delta_x * 7, self.delta_y * 7)]
 
     def calc_new_axis(self):
+        def scale_axis(cx, to_max, to_min, from_max, from_min):
+            to_width = to_max - to_min
+            from_width = from_max - from_min
+
+            if (from_width):
+                x = int(((to_width * (cx - from_min) / from_width)) + to_min)
+            else:
+                x = 0
+
+            if (x > to_max):
+                x = to_max
+            if (x < to_min):
+                x = to_min
+
+            return x
+
+        width = self.width
+        height = self.height
+
         old_xmin = int(self.old_prop_value[0])
         old_xmax = int(self.old_prop_value[1])
         old_ymin = int(self.old_prop_value[2])
@@ -66,22 +85,30 @@ class Calibrator:
         clicks_x.sort()
         clicks_y.sort()
 
-        scale_x = (old_xmax - old_xmin) * 1.0 / self.width
-        scale_y = (old_ymax - old_ymin) * 1.0 / self.height
+        x_min = float(clicks_x[0] + clicks_x[1])/2
+        x_max = float(clicks_x[2] + clicks_x[3])/2
+        y_min = float(clicks_y[0] + clicks_y[1])/2
+        y_max = float(clicks_y[2] + clicks_y[3])/2
 
-        delta_x = self.delta_x
-        delta_y = self.delta_y
-        delta_fx = self.delta_f * scale_x
-        delta_fy = self.delta_f * scale_x
+        if (abs(clicks_x[0] - clicks_x[3]) < abs(clicks_y[0] - clicks_y[3])):
+            self.swapxy = not(self.swapxy)
+            x_min, y_min = y_min, x_min
+            x_max, y_max = y_max, x_max
 
-        self.x_min = int(((clicks_x[0] + clicks_x[1])/2 - delta_x) * scale_x) \
-            + delta_fx
-        self.x_max = int(((clicks_x[2] + clicks_x[3])/2 + delta_x) * scale_x) \
-            - delta_fx
-        self.y_min = int(((clicks_y[0] + clicks_y[1])/2 - delta_y) * scale_y) \
-            + delta_fy
-        self.y_max = int(((clicks_y[2] + clicks_y[3])/2 + delta_y) * scale_y) \
-            - delta_fy
+        block_x = float(width) / self.blocks
+        block_y = float(height) / self.blocks
+
+        scale_x = (x_max - x_min) / (width - 2 * block_x)
+        x_min -= block_x * scale_x
+        x_max += block_x * scale_x
+        scale_y = (y_max - y_min) / (height - 2 * block_y)
+        y_min -= block_y * scale_y
+        y_max += block_y * scale_y
+
+        self.x_min = scale_axis(x_min, old_xmax, old_xmin, width, 0)
+        self.x_max = scale_axis(x_max, old_xmax, old_xmin, width, 0)
+        self.y_min = scale_axis(y_min, old_ymax, old_ymin, height, 0)
+        self.y_max = scale_axis(y_max, old_ymax, old_ymin, height, 0)
 
     def doubleclick(self, x, y):
         doubleclick = False
@@ -151,8 +178,8 @@ class Calibrator:
         error = None
         if self.doubleclick(x, y):
             error = 'doubleclick'
-        elif self.misclick(x, y):
-            error = 'misclick'
+        #elif self.misclick(x, y):
+        #    error = 'misclick'
         else:
             self.clicks.append((x, y))
             self.nclicks += 1
@@ -171,20 +198,20 @@ class Calibrator:
         xinput = XInput()
         inversex = 1 if self.inversex else 0
         inversey = 1 if self.inversey else 0
+        x_min = self.x_min
+        x_max = self.x_max
+        y_min = self.y_min
+        y_max = self.y_max
 
         if self.swapxy:
             xinput.set_prop(self.device, '"Evdev Axes Swap"', '1')
+            inversex, inversey = inversey, inversex
+            x_min, y_min = y_min, x_min
+            x_max, y_max = y_max, x_max
 
-            if self.inversex or self.inversey:
-                xinput.set_prop(self.device, '"Evdev Axis Inversion"',
-                                '{0}, {1}'.format(inversey, inversex))
-            xinput.set_prop(self.devices[0], '"Evdev Axis Calibration"',
-                            '{0} {1} {2} {3}'.format(self.y_min, self.y_max,
-                                                     self.x_min, self.x_max))
-        else:
-            if self.inversex or self.inversey:
-                xinput.set_prop(self.device, '"Evdev Axis Inversion"',
-                                '{0}, {1}'.format(inversex, inversey))
-            xinput.set_prop(self.device, '"Evdev Axis Calibration"',
-                            '{0} {1} {2} {3}'.format(self.x_min, self.x_max,
-                                                     self.y_min, self.y_max))
+        if self.inversex or self.inversey:
+            xinput.set_prop(self.device, '"Evdev Axis Inversion"',
+                            '{0}, {1}'.format(inversex, inversey))
+        xinput.set_prop(self.device, '"Evdev Axis Calibration"',
+                        '{0} {1} {2} {3}'.format(x_min, x_max,
+                                                 y_min, y_max))
