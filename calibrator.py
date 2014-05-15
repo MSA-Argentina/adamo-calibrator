@@ -121,7 +121,6 @@ class Calibrator:
     def misclick(self, x, y):
         def in_zone(threshold, x, y, xc, yc):
             in_zone = False
-            print "dify", abs(y - yc)
             if (xc - threshold) <= x <= (xc + threshold) and \
                     (yc - threshold) <= y <= (yc + threshold):
                 in_zone = True
