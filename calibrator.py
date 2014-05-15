@@ -1,3 +1,4 @@
+from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
 from xinput import XInput
 from random import randint
 
@@ -55,22 +56,6 @@ class Calibrator:
                        (self.delta_x * 7, self.delta_y * 7)]
 
     def calc_new_axis(self):
-        def scale_axis(cx, to_max, to_min, from_max, from_min):
-            to_width = to_max - to_min
-            from_width = from_max - from_min
-
-            if (from_width):
-                x = int(((to_width * (cx - from_min) / from_width)) + to_min)
-            else:
-                x = 0
-
-            if (x > to_max):
-                x = to_max
-            if (x < to_min):
-                x = to_min
-
-            return x
-
         width = self.width
         height = self.height
 
@@ -118,19 +103,6 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y):
-        def same_axis(threshold, x, xp, yp):
-            same_axis = False
-            if abs(x - xp) < threshold or abs(y - yp) < threshold:
-                same_axis = True
-            return same_axis
-
-        def get_adyacent((x, y), points):
-            adyacents = []
-            for point in points:
-                if x == point[0] or y == point[1]:
-                    adyacents.append(point)
-            return adyacents
-
         nclicks = self.nclicks
         threshold = self.threshold_misclick
         misclick = False
@@ -151,17 +123,6 @@ class Calibrator:
         return misclick
 
     def check_axis(self, x, y):
-        def calc_quadrant(w, h, x, y):
-            if (x - w / 2) > 0 and (y - h / 2) < 0:
-                quadrant = 1
-            elif (x - w / 2) < 0 and (y - h / 2) < 0:
-                quadrant = 2
-            elif (x - w / 2) < 0 and (y - h / 2) > 0:
-                quadrant = 3
-            elif (x - w / 2) > 0 and (y - h / 2) > 0:
-                quadrant = 4
-            return quadrant
-
         (xp, yp) = self.points_clicked[-1]
         quadrant_exp = calc_quadrant(self.width, self.height, xp, yp)
         quadrant = calc_quadrant(self.width, self.height, x, y)
@@ -199,13 +160,6 @@ class Calibrator:
         return error
 
     def get_next_point(self):
-        def get_adyacent((x, y), points):
-            adyacents = []
-            for point in points:
-                if x == point[0] or y == point[1]:
-                    adyacents.append(point)
-            return adyacents
-
         if len(self.points) > 0:
             if len(self.points_clicked) == 0:
                 point = self.points.pop(randint(0, len(self.points) - 1))
