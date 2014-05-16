@@ -16,15 +16,12 @@ class Calibrator:
 
         self.blocks = 8
         self.nclicks = 0
-        self.clicks = []
+        self.clicks = {}
         self.points = []
         self.points_clicked = []
         self.swapxy = False
         self.inversex = False
         self.inversey = False
-
-        self.delta_x = None
-        self.delta_y = None
 
         self.get_device()
 
@@ -51,13 +48,13 @@ class Calibrator:
         self.width = width
         self.height = height
 
-        self.delta_x = width / self.blocks
-        self.delta_y = height / self.blocks
+        block_x = width / self.blocks
+        block_y = height / self.blocks
 
-        self.points = [(self.delta_x, self.delta_y),
-                       (self.delta_x, self.delta_y * 7),
-                       (self.delta_x * 7, self.delta_y),
-                       (self.delta_x * 7, self.delta_y * 7)]
+        self.points = [(block_x, block_y),
+                       (block_x, block_y * 7),
+                       (block_x * 7, block_y),
+                       (block_x * 7, block_y * 7)]
 
     def calc_new_axis(self):
         #This function calcules a new axis of references, based on clicks and
@@ -70,8 +67,9 @@ class Calibrator:
         old_ymin = int(self.old_prop_value[2])
         old_ymax = int(self.old_prop_value[3])
 
-        clicks_x = [x for x, y in self.clicks]
-        clicks_y = [y for x, y in self.clicks]
+        clicks = self.clicks
+        clicks_x = [clicks[x, y][0] for x, y in clicks]
+        clicks_y = [clicks[x, y][1] for x, y in clicks]
         clicks_x.sort()
         clicks_y.sort()
 
@@ -103,9 +101,12 @@ class Calibrator:
     def doubleclick(self, x, y):
         #This function detects if a doubleclick was made
         doubleclick = False
-        for (xc, yc) in self.clicks:
-            if (abs(x - xc) < self.threshold_misclick and
-                    abs(y - yc) < self.threshold_misclick):
+        clicks = self.clicks
+        for key in clicks:
+            (xc, yc) = clicks[key]
+            print (xc, yc), key
+            if (abs(x - xc) < self.threshold_doubleclick and
+                    abs(y - yc) < self.threshold_doubleclick):
                 doubleclick = True
         return doubleclick
 
@@ -115,17 +116,15 @@ class Calibrator:
         threshold = self.threshold_misclick
         misclick = False
         if nclicks > 0:
-            dict = {}
-            for i in range(len(self.clicks)):
-                dict[self.points_clicked[i]] = self.clicks[i]
+            clicks = self.clicks
             point = self.points_clicked[-1]
             adyacents_points = get_adyacent(point, self.points_clicked[:-1])
             for adyacent_point in adyacents_points:
-                if adyacent_point in dict:
-                    if not(same_axis(threshold, x, dict[adyacent_point][0],
-                                     dict[adyacent_point][1]) or
-                            same_axis(threshold, y, dict[adyacent_point][0],
-                                      dict[adyacent_point][1])):
+                if adyacent_point in clicks:
+                    if not(same_axis(threshold, x, clicks[adyacent_point][0],
+                                     clicks[adyacent_point][1]) or
+                            same_axis(threshold, y, clicks[adyacent_point][0],
+                                      clicks[adyacent_point][1])):
                         misclick = True
 
         return misclick
@@ -166,7 +165,8 @@ class Calibrator:
         elif self.misclick(x, y):
             error = 'misclick'
         else:
-            self.clicks.append((x, y))
+            expected = self.points_clicked[-1]
+            self.clicks[expected] = (x, y)
             self.nclicks += 1
             self.check_axis(x, y)
         return error
