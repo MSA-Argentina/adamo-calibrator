@@ -29,6 +29,8 @@ class Calibrator:
         self.get_device()
 
     def get_device(self):
+        #This function loads an calibratable device from xinput, if detect more
+        #than one device, this select the first.
         xinput = XInput()
         devices = xinput.get_device_with_prop('Evdev Axis Calibration')
         if len(devices) == 0:
@@ -36,7 +38,7 @@ class Calibrator:
             quit()
         if len(devices) > 1:
             print "More than one devices detected. Using last."
-            self.device = devices[1]
+            self.device = devices[0]
         else:
             self.device = devices[0]
 
@@ -44,6 +46,8 @@ class Calibrator:
                                               'Evdev Axis Calibration')
 
     def set_screen_prop(self, width, height):
+        #This function set the screen width and height and realize some
+        #calcules respecting of points and the separation between this
         self.width = width
         self.height = height
 
@@ -56,6 +60,8 @@ class Calibrator:
                        (self.delta_x * 7, self.delta_y * 7)]
 
     def calc_new_axis(self):
+        #This function calcules a new axis of references, based on clicks and
+        #old axis references witch uses in a transform with new axis
         width = self.width
         height = self.height
 
@@ -95,6 +101,7 @@ class Calibrator:
         self.y_max = scale_axis(y_max, old_ymax, old_ymin, height, 0)
 
     def doubleclick(self, x, y):
+        #This function detects if a doubleclick was made
         doubleclick = False
         for (xc, yc) in self.clicks:
             if (abs(x - xc) < self.threshold_misclick and
@@ -103,6 +110,7 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y):
+        #This function detects if a misclick was made.
         nclicks = self.nclicks
         threshold = self.threshold_misclick
         misclick = False
@@ -123,6 +131,8 @@ class Calibrator:
         return misclick
 
     def check_axis(self, x, y):
+        #This function checks if a inversion of axis or swapping of axis is
+        #needed.
         (xp, yp) = self.points_clicked[-1]
         quadrant_exp = calc_quadrant(self.width, self.height, xp, yp)
         quadrant = calc_quadrant(self.width, self.height, x, y)
@@ -147,6 +157,8 @@ class Calibrator:
             self.swapxy = False
 
     def add_click(self, click):
+        #This function register a new click made by user and return an error
+        #if it's need
         (x, y) = click
         error = None
         if self.doubleclick(x, y):
@@ -160,6 +172,7 @@ class Calibrator:
         return error
 
     def get_next_point(self):
+        #This function returns the next point if is available
         if len(self.points) > 0:
             if len(self.points_clicked) == 0:
                 point = self.points.pop(randint(0, len(self.points) - 1))
@@ -175,6 +188,8 @@ class Calibrator:
         return point
 
     def finish(self):
+        #This function save a new axis reference and inverse the values if
+        #need.
         xinput = XInput()
         inversex = 1 if self.inversex else 0
         inversey = 1 if self.inversey else 0
