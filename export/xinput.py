@@ -3,20 +3,27 @@ from os import popen
 
 class XInput:
 
-    def get_device_with_prop(self, prop):
+    def get_device_with_prop(self, prop, id_only=True):
         devices = []
         proc = popen('xinput list --id-only')
         stdout = proc.read()
         dev_ids = stdout.split('\n')[0:-1]
+        if not id_only:
+            proc = popen('xinput list --name-only')
+            stdout = proc.read()
+            dev_names = stdout.split('\n')[0:-1]
 
-        for id in dev_ids:
+        for i, id in enumerate(dev_ids):
             proc = popen('xinput list-props %s' % id)
             stdout = proc.read()
             if prop in stdout:
                 stdout = stdout.split('\n')
                 for property in stdout:
                     if prop in property and '<no items>' not in property:
-                        devices.append(id)
+                        if id_only:
+                            devices.append(id)
+                        else:
+                            devices.append((dev_names[i], id))
                         break
         return devices
 

@@ -38,7 +38,7 @@ class Window(Zaguan):
         gtk.main()
 
 
-def load_window():
+def run_web():
     controller = CalibratorController()
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     file_ = os.path.join(cur_dir, 'html/index.html')
@@ -48,4 +48,4 @@ def load_window():
 
 
 if __name__ == "__main__":
-    load_window()
+    run_web()
