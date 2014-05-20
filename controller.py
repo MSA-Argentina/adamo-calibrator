@@ -11,7 +11,7 @@ class CalibratorController(WebContainerController):
         instance = CalibratorControllerActions(controller=self)
         self.add_processor("calibrator", instance)
 
-        self.calibrator = Calibrator(5, 30, 15, 20)
+        self.calibrator = Calibrator(5, 15, 100, 20)
 
     def ready(self, data):
         next = self.calibrator.get_next_point()
@@ -19,7 +19,7 @@ class CalibratorController(WebContainerController):
 
     def set_resolution(self, data):
         self.calibrator.set_screen_prop(data[0], data[1])
-        print "Screen resolution: ", data[1]
+        print "Screen resolution: ", data[0], 'x', data[1]
         self.send_command('ready')
 
     def finish(self):
@@ -27,15 +27,19 @@ class CalibratorController(WebContainerController):
         self.calibrator.finish()
 
     def register_click(self, data):
-        print "Click detected: ", data
         error = self.calibrator.add_click(data)
         if error is None:
             print "Click valid: ", data
             next = self.calibrator.get_next_point()
             if next is None:
                 #TODO: Send finish message to frontend
-                print self.calibrator.clicks
                 self.finish()
                 quit()
             else:
                 self.send_command('move_pointer', next)
+        if error == 'misclick':
+            print "Misclick detected: ", data
+            self.send_command('misclick', data)
+        if error == 'doubleclick':
+            print "Doubleclick detected: ", data
+            self.send_command('doubleclick', data)
