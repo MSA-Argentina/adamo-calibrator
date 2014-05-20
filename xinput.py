@@ -35,4 +35,5 @@ class XInput:
         return value
 
     def set_prop(self, dev_id, property, data):
+        print('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
         popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
