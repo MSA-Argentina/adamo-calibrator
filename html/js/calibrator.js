@@ -6,6 +6,7 @@ function initiate(){
 }
 
 function click(e){
+    $("#error").css('display', 'none');
     var click_pos = get_click_position(e);
     send('click', click_pos);
 }
@@ -27,6 +28,16 @@ function get_click_position(e) {
 function ready() {
     $("#img_pointer").css('display', 'inline');
     send('ready');
+}
+
+function misclick(data){
+    $("#error-msg").text("Misclick Detected on " + data);
+    $("#error").css('display', 'inline');
+}
+
+function doubleclick(data){
+    $("#error-msg").text("Doubleclick Detected on " + data);
+    $("#error").css('display', 'inline');
 }
 
 $(document).ready(function(){
