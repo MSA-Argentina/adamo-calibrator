@@ -73,4 +73,17 @@ Una vez realizado esto se pueden dar diversos casos. Debajo se muestran unos eje
 
 ###Tercer Etapa
 
-Esta útlima etapa consiste en la calibración
+Esta útlima etapa consiste en la calibración, para calcular los nuevos valores se utiliza un esquema de dos constantes. Este esquema permite corregir problemas de alineacion de los ejes X e Y, y además problemas de escalas entre la resolución de la pantalla y el controlador del touchscreen, pero no permite corregir desperfectos de rotación de la pantalla.
+
+El procedimiento consiste en transformar las coordenadas recibidas por el controlador del touchscreen en las coordenadas de la pantalla por medio de la multiplicación de dos constantes tal como se muestra en las siguientes fórmulas:
+
+> `` Y' = aY + b ``
+
+> `` X' = cX + d ``
+
+Donde:
+* X': es la coordenada en x de la pantalla.
+* Y': es la coordenada en y de la pantalla.
+* X: es la coordenada en x del controlador del touchscreen.
+* Y: es la coordenada en y del controlador del touchscreen.
+* a, b, c, d: son constantes.
