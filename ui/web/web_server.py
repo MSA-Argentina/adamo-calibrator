@@ -2,7 +2,7 @@
 from flask.app import Flask
 from flask.globals import request
 
-from controller import CalibratorController
+from ui.web.controller import CalibratorController
 
 _msg_queue = []
 

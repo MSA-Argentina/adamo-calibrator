@@ -1,7 +1,7 @@
 from zaguan.controller import WebContainerController
-from actions import CalibratorControllerActions
+from ui.web.actions import CalibratorControllerActions
 
-from calibrator import Calibrator
+from calibrator.calibrator import Calibrator
 
 
 class CalibratorController(WebContainerController):

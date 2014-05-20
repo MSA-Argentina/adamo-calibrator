@@ -10,7 +10,7 @@ import urllib
 
 from time import sleep
 from zaguan import Zaguan
-from controller import CalibratorController
+from ui.web.controller import CalibratorController
 from settings import FULLSCREEN
 
 

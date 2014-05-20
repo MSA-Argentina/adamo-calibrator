@@ -1,5 +1,5 @@
 from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
-from xinput import XInput
+from export.xinput import XInput
 from random import randint
 
 
