@@ -1,4 +1,5 @@
 from os import popen
+from settings import TEST
 
 
 class XInput:
@@ -43,4 +44,5 @@ class XInput:
 
     def set_prop(self, dev_id, property, data):
         print('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
-        popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
+        if not TEST:
+            popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
