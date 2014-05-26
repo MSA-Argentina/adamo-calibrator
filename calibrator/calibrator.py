@@ -1,6 +1,7 @@
 from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
 from export.xinput import XInput
 from random import randint
+from settings import TEST
 
 
 class Calibrator:
@@ -23,7 +24,11 @@ class Calibrator:
         self.inversex = False
         self.inversey = False
 
-        self.get_device()
+        if TEST:
+            self.device = 'fake'
+            self.old_prop_value = [0, 1000, 0, 1000]
+        else:
+            self.get_device()
 
     def get_device(self):
         #This function loads an calibratable device from xinput, if detect more
