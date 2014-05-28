@@ -27,7 +27,7 @@ if '--list' in argv:
                                             id_only=False)
     print "Devices:"
     for name, id in devices:
-        print("Device -> Id: {0:2}\tName: {1}".format(id, name))
+        print("\tId: {0:2}\tName: {1}".format(id, name))
 if '--device' in argv:
     idx = argv.index('--device')
     device = argv[idx + 1]
@@ -42,16 +42,12 @@ if '--gui' in argv:
     idx = argv.index('--gui')
     interface = argv[idx + 1]
     if interface == 'web':
-        from ui.run_zaguan import run_web
-        run = run_web
+        from ui.run_zaguan import run_web as run
     elif interface == 'gtk':
-        #from ui.run_gtk import run_gtk as run
-        def run():
-            print "GTK"
-        run = run
+        from ui.run_gtk import run_gtk as run
     else:
         run = error
     run()
-#else:
-#    from ui.run_zaguan import run_web
-#    run_web()
+else:
+    from ui.run_gtk import run_gtk
+    run_gtk()
