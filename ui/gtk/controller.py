@@ -12,8 +12,11 @@ from pango import FontDescription
 from calibrator.calibrator import Calibrator
 from settings import DUALCLICK_THRESHOLD, FINGER_DELTA, MISCLICK_THRESHOLD, \
     NPOINTS, FULLSCREEN, TIMEOUT
+from ui.helpers import load_locales
 
 INTERVAL = 50
+
+load_locales()
 
 
 class Window():
@@ -105,14 +108,15 @@ class Window():
                 data = (event.x_root, event.y_root)
                 error = self.calibrator.add_click(data)
                 if error is None:
-                    print "Click valid: ", data
+                    msg = _("valid_click_detected")
+                    print msg, data
                     self.next = self.calibrator.get_next_point()
                     self.status = ('calibrating', None)
                 elif error == 'misclick':
-                    msg = "Misclick detected"
+                    msg = _("misclick_detected")
                     self.error(msg)
                 elif error == 'doubleclick':
-                    msg = "Doubleclick detected"
+                    msg = _("doubleclick_detected")
                     self.error(msg)
             elif status == 'finish':
                 quit()
@@ -162,19 +166,19 @@ class Window():
     def init_dialog(self, widget, event):
         self.status = ('init', None)
         font = 'Helvetica Bold 16'
-        msg = 'Adamo Calibrator'
+        msg = _("title")
         self.draw_text(400, 200, font, msg, rect=False,
                        text_top=self.height/2 - 60)
-        msg = "Please touch screen for start or wait for exit..."
+        msg = _("init_msg")
         self.draw_text(400, 200, self.font, msg)
 
     def calibration_dialog(self):
-        msg = "Please touch the pointer or wait for exit..."
+        msg = _("calibration_msg")
         self.draw_text(400, 200, self.font, msg)
 
     def end_dialog(self):
         self.status = ('finish', None)
-        msg = "Your screen are now calibrated."
+        msg = _("finish_msg")
         self.draw_text(400, 200, self.font, msg)
 
     def error(self, msg):

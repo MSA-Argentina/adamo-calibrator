@@ -1,0 +1,20 @@
+msgid "title"
+msgstr "Adamo Calibrator"
+
+msgid "init_msg"
+msgstr "Please touch screen for start or wait for exit..."
+
+msgid "calibration_msg"
+msgstr "Please touch the pointer or wait for exit..."
+
+msgid "finish_msg"
+msgstr "Your screen are now calibrated."
+
+msgid "valid_click_detected"
+msgstr "Valid click detected."
+
+msgid "misclick_detected"
+msgstr "Misclick detected."
+
+msgid "doubleclick_detected"
+msgstr "Doubleclick detected."
