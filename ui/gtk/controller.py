@@ -10,8 +10,7 @@ from gobject import source_remove, timeout_add
 from pango import FontDescription
 
 from calibrator.calibrator import Calibrator
-from settings import DUALCLICK_THRESHOLD, FINGER_DELTA, MISCLICK_THRESHOLD, \
-    NPOINTS, FULLSCREEN, TIMEOUT
+from settings import DEBUG, FULLSCREEN, NPOINTS
 from ui.helpers import load_locales
 
 INTERVAL = 50
@@ -21,7 +20,8 @@ load_locales()
 
 class Window():
 
-    def __init__(self):
+    def __init__(self, fake, device, misclick_threshold, dualclick_threshold,
+                 finger_delta, timeout, fast_start):
         gtk.gdk.threads_init()
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("destroy", gtk.main_quit)
@@ -43,8 +43,9 @@ class Window():
         self.window.connect('button-press-event', self.on_button_pressed)
         self.window.connect('button-release-event', self.on_button_released)
 
-        self.calibrator = Calibrator(NPOINTS, MISCLICK_THRESHOLD,
-                                     DUALCLICK_THRESHOLD, FINGER_DELTA)
+        self.calibrator = Calibrator(NPOINTS, misclick_threshold,
+                                     dualclick_threshold, finger_delta, device,
+                                     fake)
 
         screen = self.window.get_screen()
         self.width = screen.get_width()
@@ -52,10 +53,16 @@ class Window():
 
         self.calibrator.set_screen_prop(self.width, self.height)
 
-        self.status = (None, None)
-        self.next = (0, 0)
+        if fast_start:
+            self.status = ('calibrating', None)
+            self.next = self.calibrator.get_next_point()
+        else:
+            self.status = ('init', None)
+            self.next = (0, 0)
         self.counter = 0
-        self.timer = timeout_add(INTERVAL, self.timeout_quit)
+        self.timeout = timeout
+        if timeout != 0:
+            self.timer = timeout_add(INTERVAL, self.timeout_quit)
 
         self.font = 'Helvetica 12'
 
@@ -89,7 +96,7 @@ class Window():
             drawable = self.drawable
             gc = self.gc
             self.counter += INTERVAL
-            angle = (self.counter * 360) / TIMEOUT
+            angle = (self.counter * 360) / self.timeout
             drawable.draw_arc(gc, True, self.width/2 - 25, self.height/2 + 25,
                               50, 50, 0, -angle*64)
             if self.next is not None:
@@ -109,14 +116,19 @@ class Window():
                 error = self.calibrator.add_click(data)
                 if error is None:
                     msg = _("valid_click_detected")
-                    print msg, data
+                    if DEBUG:
+                        print msg, data
                     self.next = self.calibrator.get_next_point()
                     self.status = ('calibrating', None)
                 elif error == 'misclick':
                     msg = _("misclick_detected")
+                    if DEBUG:
+                        print msg, data
                     self.error(msg)
                 elif error == 'doubleclick':
                     msg = _("doubleclick_detected")
+                    if DEBUG:
+                        print msg, data
                     self.error(msg)
             elif status == 'finish':
                 quit()
@@ -126,7 +138,8 @@ class Window():
         if event.button == 1:
             self.drawable.clear()
             if self.next is None:
-                source_remove(self.timer)
+                if self.timeout != 0:
+                    source_remove(self.timer)
                 self.finish()
             else:
                 if self.status[0] == 'error':
@@ -164,13 +177,14 @@ class Window():
         drawable.draw_layout(gc, text_left, text_top, layout)
 
     def init_dialog(self, widget, event):
-        self.status = ('init', None)
         font = 'Helvetica Bold 16'
         msg = _("title")
         self.draw_text(400, 200, font, msg, rect=False,
                        text_top=self.height/2 - 60)
         msg = _("init_msg")
         self.draw_text(400, 200, self.font, msg)
+        if next is not None:
+            self.draw_pointer(self.next)
 
     def calibration_dialog(self):
         msg = _("calibration_msg")

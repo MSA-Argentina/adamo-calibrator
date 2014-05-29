@@ -1,53 +1,49 @@
-from sys import argv
+from argparse import ArgumentParser
 
-parameters = """Adamo Calibrator
-Help:
-    -h, --help: Print this help message.
-    -v, --verbose: Print debug messages during calibration process.
-    --list: List calibratables input devices.
-    --device <id>: Select a specific device to calibrate.
-    --manual <x_min, x_max, y_min, y_max>: Set manual calibration values.
-    --misclick <threshold>: Set misclick threshold.
-    --output <xinput>: Set type of output setting.
-    --gui <web|gtk>: Set gui interface.
-"""
+from settings import FAST_START, MISCLICK_THRESHOLD, DUALCLICK_THRESHOLD, \
+    TIMEOUT, FINGER_DELTA
 
+parser = ArgumentParser()
+group_ui = parser.add_mutually_exclusive_group()
+group_dev = parser.add_mutually_exclusive_group()
 
-def error():
-    print "Error."
+group_dev.add_argument('--device', type=int, metavar='dev-id', default=None,
+                       help='Set device ID manually for calibration.')
+group_dev.add_argument('--fake', action="store_true",
+                       help="Use a fake device.")
+parser.add_argument('--dualclick', type=int, metavar='threshold',
+                    default=DUALCLICK_THRESHOLD,
+                    help='Set dualclick threshold.')
+parser.add_argument('--misclick', type=int, metavar='threshold',
+                    default=MISCLICK_THRESHOLD, help='Set misclick threshold.')
+parser.add_argument('--faststart', action="store_true", default=FAST_START,
+                    help="Use a fake device.")
+group_ui.add_argument('-g', '--gui', choices=['gtk', 'web'],
+                      help='Set GUI.')
+group_ui.add_argument('-l', '--list', action="store_true",
+                      help='List calibratables devices available.')
+parser.add_argument('--timeout', type=int, metavar='milliseconds',
+                    default=TIMEOUT,
+                    help='Set timeout in milliseconds. (0 for disable)')
 
-if '-h' in argv or '--help' in argv:
-    print parameters
-    quit()
-if '-v' in argv or '--verbose' in argv:
-    DEBUG = True
-if '--list' in argv:
+args = parser.parse_args()
+
+if args.list:
     from export.xinput import XInput
-    devices = XInput().get_device_with_prop('Evdev Axis Calibration',
-                                            id_only=False)
+    devices = XInput.get_device_with_prop('Evdev Axis Calibration',
+                                          id_only=False)
     print "Devices:"
     for name, id in devices:
         print("\tId: {0:2}\tName: {1}".format(id, name))
-if '--device' in argv:
-    idx = argv.index('--device')
-    device = argv[idx + 1]
-if '--manual' in argv:
-    print "MANUAL"
-if '--output' in argv:
-    idx = argv.index('--output')
-    output_type = argv[idx + 1]
+    quit()
+
+if args.gui == 'web':
+    from ui.run_zaguan import run_web as run
 else:
-    output_type = 'xinput'
-if '--gui' in argv:
-    idx = argv.index('--gui')
-    interface = argv[idx + 1]
-    if interface == 'web':
-        from ui.run_zaguan import run_web as run
-    elif interface == 'gtk':
-        from ui.run_gtk import run_gtk as run
-    else:
-        run = error
-    run()
-else:
-    from ui.run_gtk import run_gtk
-    run_gtk()
+    from ui.run_gtk import run_gtk as run
+
+print args
+
+run(fake=args.fake, device=args.device, misclick_threshold=args.misclick,
+    dualclick_threshold=args.dualclick, finger_delta=FINGER_DELTA,
+    timeout=args.timeout, fast_start=args.faststart)

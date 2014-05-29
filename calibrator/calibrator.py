@@ -7,7 +7,7 @@ from settings import TEST
 class Calibrator:
 
     def __init__(self, npoints, threshold_misclick, threshold_doubleclick,
-                 delta_f):
+                 delta_f, device=None, fake=False):
         self.width = None
         self.height = None
 
@@ -24,17 +24,19 @@ class Calibrator:
         self.inversex = False
         self.inversey = False
 
-        if TEST:
+        if fake:
             self.device = 'fake'
             self.old_prop_value = [0, 1000, 0, 1000]
+        elif device is not None:
+            self.device = device
+            self.get_device_prop()
         else:
             self.get_device()
 
     def get_device(self):
         #This function loads an calibratable device from xinput, if detect more
         #than one device, this select the first.
-        xinput = XInput()
-        devices = xinput.get_device_with_prop('Evdev Axis Calibration')
+        devices = XInput.get_device_with_prop('Evdev Axis Calibration')
         if len(devices) == 0:
             print "Error: No calibratable devices found."
             quit()
@@ -43,8 +45,10 @@ class Calibrator:
             self.device = devices[0]
         else:
             self.device = devices[0]
+        self.get_device_with_prop()
 
-        self.old_prop_value = xinput.get_prop(self.device,
+    def get_device_prop(self):
+        self.old_prop_value = XInput.get_prop(self.device,
                                               'Evdev Axis Calibration')
 
     def set_screen_prop(self, width, height):
@@ -109,7 +113,6 @@ class Calibrator:
         clicks = self.clicks
         for key in clicks:
             (xc, yc) = clicks[key]
-            print (xc, yc), key
             if (abs(x - xc) < self.threshold_doubleclick and
                     abs(y - yc) < self.threshold_doubleclick):
                 doubleclick = True
