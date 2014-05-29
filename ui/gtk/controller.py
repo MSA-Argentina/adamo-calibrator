@@ -3,14 +3,17 @@ try:
     import gtk
 except ImportError:
     print "You don't have GTK installed"
-
 import pygtk
 pygtk.require('2.0')
-import pango
+
+from gobject import source_remove, timeout_add
+from pango import FontDescription
 
 from calibrator.calibrator import Calibrator
 from settings import DUALCLICK_THRESHOLD, FINGER_DELTA, MISCLICK_THRESHOLD, \
-    NPOINTS, FULLSCREEN
+    NPOINTS, FULLSCREEN, TIMEOUT
+
+INTERVAL = 50
 
 
 class Window():
@@ -48,6 +51,10 @@ class Window():
 
         self.status = (None, None)
         self.next = (0, 0)
+        self.counter = 0
+        self.timer = timeout_add(INTERVAL, self.timeout_quit)
+
+        self.font = 'Helvetica 12'
 
         gtk.main()
 
@@ -71,44 +78,59 @@ class Window():
         gtk.main_quit()
         return False
 
-    def on_button_pressed(self, widget, event):
-        if event.button == 1 and self.status[0] is not 'init':
-            data = (event.x_root, event.y_root)
-            error = self.calibrator.add_click(data)
-            if error is None:
-                print "Click valid: ", data
-                self.next = self.calibrator.get_next_point()
-                self.status = ('calibrating', None)
-            elif error == 'misclick':
-                msg = "Misclick detected"
-                print msg, ':', data
-                self.error(msg)
-            elif error == 'doubleclick':
-                msg = "Doubleclick detected"
-                print msg, ':', data
-                self.error(msg)
-            return True
+    def timeout_quit(self):
+        time_elapsed = self.counter / 1000
+        if time_elapsed == 5:
+            quit()
         else:
-            self.status = ('calibrating', None)
-            self.next = self.calibrator.get_next_point()
+            drawable = self.drawable
+            gc = self.gc
+            self.counter += INTERVAL
+            angle = (self.counter * 360) / TIMEOUT
+            drawable.draw_arc(gc, True, self.width/2 - 25, self.height/2 + 25,
+                              50, 50, 0, -angle*64)
+            if self.next is not None:
+                self.draw_pointer(self.next)
+            return True
+
+    def on_button_pressed(self, widget, event):
+        if event.button == 1:
+            # Reset Timeout
+            self.counter = 0
+            status = self.status[0]
+            if status == 'init':
+                self.status = ('calibrating', None)
+                self.next = self.calibrator.get_next_point()
+            elif status == 'calibrating' or status == 'error':
+                data = (event.x_root, event.y_root)
+                error = self.calibrator.add_click(data)
+                if error is None:
+                    print "Click valid: ", data
+                    self.next = self.calibrator.get_next_point()
+                    self.status = ('calibrating', None)
+                elif error == 'misclick':
+                    msg = "Misclick detected"
+                    self.error(msg)
+                elif error == 'doubleclick':
+                    msg = "Doubleclick detected"
+                    self.error(msg)
+            elif status == 'finish':
+                quit()
+        return True
 
     def on_button_released(self, widget, event):
         if event.button == 1:
             self.drawable.clear()
             if self.next is None:
+                source_remove(self.timer)
                 self.finish()
-                quit()
             else:
                 if self.status[0] == 'error':
                     self.error(self.status[1])
+                else:
+                    self.calibration_dialog()
                 self.draw_pointer(self.next)
         return True
-
-    def init_dialog(self, widget, event):
-        msg = "Please touch screen for start..."
-        font = 'Helvetica 12'
-        self.status = ('init', msg)
-        self.draw_text(400, 200, font, msg)
 
     def draw_text(self, width, height, font, text):
         drawing_area = self.drawing_area
@@ -118,7 +140,7 @@ class Window():
         left = self.width / 2 - width / 2
         top = self.height / 2 - height / 2
 
-        font_desc = pango.FontDescription(font)
+        font_desc = FontDescription(font)
 
         layout = drawing_area.create_pango_layout(text)
         layout.set_font_description(font_desc)
@@ -127,14 +149,30 @@ class Window():
         text_left = left + (width - text_width) / 2
         text_top = top + (height - text_height) / 2
         drawable.draw_rectangle(gc, False, left, top, width, height)
-        drawable.draw_rectangle(gc, False, left - 2, top - 2, width + 4, height + 4)
+        drawable.draw_rectangle(gc, False, left - 2, top - 2, width + 4,
+                                height + 4)
         drawable.draw_layout(gc, text_left, text_top, layout)
+
+    def init_dialog(self, widget, event):
+        self.status = ('init', None)
+        msg = "Please touch screen for start or wait for exit..."
+
+        self.draw_text(400, 200, self.font, msg)
+
+    def calibration_dialog(self):
+        msg = "Please touch the pointer or wait for exit..."
+        self.draw_text(400, 200, self.font, msg)
+
+    def end_dialog(self):
+        self.status = ('finish', None)
+        msg = "Your screen are now calibrated."
+        self.draw_text(400, 200, self.font, msg)
 
     def error(self, msg):
         self.status = ('error', msg)
-        font = 'Helvetica 12'
-        self.draw_text(200, 100, font, msg)
+        self.draw_text(400, 200, self.font, msg)
 
     def finish(self):
+        self.end_dialog()
         self.calibrator.calc_new_axis()
         self.calibrator.finish()
