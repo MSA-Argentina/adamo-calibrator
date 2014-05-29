@@ -132,13 +132,16 @@ class Window():
                 self.draw_pointer(self.next)
         return True
 
-    def draw_text(self, width, height, font, text):
+    def draw_text(self, width, height, font, text, rect=True, left=None,
+                  top=None, text_top=None, text_left=None):
         drawing_area = self.drawing_area
         drawable = self.drawable
         gc = self.gc
 
-        left = self.width / 2 - width / 2
-        top = self.height / 2 - height / 2
+        if left is None:
+            left = self.width / 2 - width / 2
+        if top is None:
+            top = self.height / 2 - height / 2
 
         font_desc = FontDescription(font)
 
@@ -146,17 +149,23 @@ class Window():
         layout.set_font_description(font_desc)
         text_width, text_height = layout.get_pixel_size()
 
-        text_left = left + (width - text_width) / 2
-        text_top = top + (height - text_height) / 2
-        drawable.draw_rectangle(gc, False, left, top, width, height)
-        drawable.draw_rectangle(gc, False, left - 2, top - 2, width + 4,
-                                height + 4)
+        if text_left is None:
+            text_left = left + (width - text_width) / 2
+        if text_top is None:
+            text_top = top + (height - text_height) / 2
+        if rect:
+            drawable.draw_rectangle(gc, False, left, top, width, height)
+            drawable.draw_rectangle(gc, False, left - 2, top - 2, width + 4,
+                                    height + 4)
         drawable.draw_layout(gc, text_left, text_top, layout)
 
     def init_dialog(self, widget, event):
         self.status = ('init', None)
+        font = 'Helvetica Bold 16'
+        msg = 'Adamo Calibrator'
+        self.draw_text(400, 200, font, msg, rect=False,
+                       text_top=self.height/2 - 60)
         msg = "Please touch screen for start or wait for exit..."
-
         self.draw_text(400, 200, self.font, msg)
 
     def calibration_dialog(self):
