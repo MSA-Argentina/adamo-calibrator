@@ -1,10 +1,11 @@
-try:
-    import gtk
-except ImportError:
-    print "You don't have GTK installed"
-
-import pygtk
-pygtk.require('2.0')
+#try:
+#    import gtk
+#except ImportError:
+#    print "You don't have GTK installed"
+#
+#import pygtk
+#pygtk.require('2.0')
+from zaguan import gtk
 import os
 import urllib
 
@@ -38,10 +39,13 @@ class Window(Zaguan):
         gtk.main()
 
 
-def run_web():
-    controller = CalibratorController()
+def run_web(fake, device, misclick_threshold, dualclick_threshold,
+            finger_delta, timeout, fast_start):
+    controller = CalibratorController(fake, device, misclick_threshold,
+                                      dualclick_threshold, finger_delta,
+                                      timeout, fast_start)
     cur_dir = os.path.dirname(os.path.abspath(__file__))
-    file_ = os.path.join(cur_dir, 'html/index.html')
+    file_ = os.path.join(cur_dir, 'web/html/index.html')
     uri = 'file://' + urllib.pathname2url(file_)
     zaguan = Window(uri, controller)
     zaguan.run()

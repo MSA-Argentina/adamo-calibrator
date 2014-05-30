@@ -9,6 +9,7 @@ class CalibratorControllerActions(BaseActionController):
         self.controller.set_resolution(data)
 
     def click(self, data):
+        print "Click:", data
         self.controller.register_click(data)
 
     def log(self, data):

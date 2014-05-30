@@ -2,16 +2,20 @@ from zaguan.controller import WebContainerController
 from ui.web.actions import CalibratorControllerActions
 
 from calibrator.calibrator import Calibrator
+from settings import NPOINTS
 
 
 class CalibratorController(WebContainerController):
 
-    def __init__(self):
+    def __init__(self, fake, device, misclick_threshold, dualclick_threshold,
+                 finger_delta, timeout, fast_start):
         WebContainerController.__init__(self)
         instance = CalibratorControllerActions(controller=self)
         self.add_processor("calibrator", instance)
 
-        self.calibrator = Calibrator(5, 15, 100, 20)
+        self.calibrator = Calibrator(NPOINTS, misclick_threshold,
+                                     dualclick_threshold, finger_delta, device,
+                                     fake)
 
     def ready(self, data):
         next = self.calibrator.get_next_point()
@@ -37,9 +41,9 @@ class CalibratorController(WebContainerController):
                 quit()
             else:
                 self.send_command('move_pointer', next)
-        if error == 'misclick':
+        elif error == 'misclick':
             print "Misclick detected: ", data
             self.send_command('misclick', data)
-        if error == 'doubleclick':
+        elif error == 'doubleclick':
             print "Doubleclick detected: ", data
             self.send_command('doubleclick', data)
