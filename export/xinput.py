@@ -2,9 +2,9 @@ from os import popen
 from settings import TEST
 
 
-class XInput:
-
-    def get_device_with_prop(self, prop, id_only=True):
+class XInput(object):
+    @staticmethod
+    def get_device_with_prop(prop, id_only=True):
         devices = []
         proc = popen('xinput list --id-only')
         stdout = proc.read()
@@ -28,7 +28,8 @@ class XInput:
                         break
         return devices
 
-    def get_prop(self, dev_id, prop):
+    @staticmethod
+    def get_prop(dev_id, prop):
         value = None
         proc = popen('xinput list-props  %s' % dev_id)
         stdout = proc.read()
@@ -42,7 +43,8 @@ class XInput:
                     break
         return value
 
-    def set_prop(self, dev_id, property, data):
+    @staticmethod
+    def set_prop(dev_id, property, data):
         print('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
         if not TEST:
             popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
