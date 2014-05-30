@@ -1,7 +1,6 @@
 from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
 from export.xinput import XInput
 from random import randint
-from settings import TEST
 
 
 class Calibrator:
@@ -45,7 +44,7 @@ class Calibrator:
             self.device = devices[0]
         else:
             self.device = devices[0]
-        self.get_device_with_prop()
+        self.get_device_prop()
 
     def get_device_prop(self):
         self.old_prop_value = XInput.get_prop(self.device,
