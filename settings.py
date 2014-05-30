@@ -1,4 +1,4 @@
-TEST = True
+TEST = False
 
 DEBUG = True
 FULLSCREEN = True
