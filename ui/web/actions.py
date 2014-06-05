@@ -6,7 +6,7 @@ class CalibratorControllerActions(BaseActionController):
     """Actions for calibrator controller"""
 
     def initiate(self, data):
-        self.controller.set_resolution(data)
+        self.controller.initiate(data)
 
     def click(self, data):
         print "Click:", data

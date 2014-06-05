@@ -2,11 +2,13 @@
     <html lang="en">
         <head>
             <meta charset="utf-8" />
-            <title>Calibrador</title>
+            <title></title>
             <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
             <link rel="stylesheet" type="text/css" href="css/style.css">
             <script src="js/jquery-2.0.3.min.js"></script>
             <script src="js/zaguan.js"></script>
+            <script src="js/helpers.js"></script>
+            <script src="js/show_hide.js"></script>
             <script src="js/calibrator.js"></script>
         </head>
 
@@ -16,25 +18,16 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-12 header">
-                        <h1>TouchScreen<br>Calibration</h1>
-                        <img src="img/escuadra.png" alt="logo">
+                        <h1 id="title"></h1>
                     </div>
 
                     <div class="col-md-12">
-                        <div class="start">
-                            <h2><b>Press the point</b>, use a stylus to increase precision.</h2>
-                        </div>
-
-                        <div class="loading">
-                            <p>To abort, press any key or wait</p>
-                        </div>
-                        <div class="alert alert-danger" id="error">
-                            <strong>Error:</strong>Mis-click detected, restarting...
-                        </div>
-
-                        <div class="success">
-                            <h2><b>Successful process.</b><br>The screen has been calibrated.</h2>
-                        </div>
+                        <div class="dialog start" id="init_msg"></div>
+                        <div class="dialog loading" id="calibration_msg"></div>
+                        <div class="alert alert-danger" id="error_misclick"></div>
+                        <div class="alert alert-danger" id="error_doubleclick"></div>
+                        <div class="alert alert-danger" id="error_time"></div>
+                        <div class="dialog success" id="finish_msg"></div>
                     </div>
                 </div>
             </div>

@@ -9,24 +9,18 @@ var step = 1;
 var interval = null;
 var progress_speed = 10
 
-
-function initiate(){
-	var screen_resolution = [screen.width, screen.height];
-	send('initiate', screen_resolution);
-}
+var state = null;
+var timeout = null;
 
 function click(e){
-	$("#error").css('display', 'none');
 	var click_pos = get_click_position(e);
 	send('click', click_pos);
 }
 
 function move_pointer(xy){
-	var indicators = $(".indicators");
+	show_indicators();
 	var img_pointer = $("#pointer");
 	var progress = $("#progress");
-
-	indicators.css('display', 'inline');
 
 	img_pointer.css('left', xy[0] - (parseInt(img_pointer.css('width')) / 2));
 	img_pointer.css('top', xy[1] - (parseInt(img_pointer.css('height')) / 2));
@@ -36,35 +30,40 @@ function move_pointer(xy){
 }
 
 function get_click_position(e) {
-	var xPosition = e.clientX;
-	var yPosition = e.clientY;
-	return [xPosition, yPosition]
+    var xPosition = e.clientX;
+    var yPosition = e.clientY;
+    return [xPosition, yPosition]
 }
 
-function ready() {
-  	$(".indicators").css('display', 'inline');
-	send('ready');
+function initiate(){
+	var screen_resolution = [screen.width, screen.height];
+	send('initiate', screen_resolution);
 }
 
-function misclick(data){
-	$("#error").text("Error: Misclick Detected on " + data);
-	$("#error").css('display', 'inline');
-}
 
-function doubleclick(data){
-	$("#error").text("Error: Doubleclick Detected on " + data);
-	$("#error").css('display', 'inline');
-}
-
-function time_error(){
-	$("#error").text("Error: Please maintain pressed the pointer more time.");
-	$("#error").css('display', 'inline');
+function ready(data) {
+	set_locale(data.locale)
+	timeout = data.timeout;
+	state = data.state
+	if (data.fast_start){
+		move_pointer(data.next);
+	}
+  	show_indicators();
+  	show_calibration_msg();
 }
 
 function end(){
-	$("#error").css('display', 'none');
-	$(".indicators").css('display', 'none');
-	$(".success").css('display', 'block');
+	state = 'end';
+	end_dialog();
+}
+
+function error(type){
+	if (type == 'misclick'){
+		misclick_dialog();
+	}
+	else if (type == 'doubleclick'){
+		doubleclick_dialog();
+	}
 }
 
 var draw = function(current) {
@@ -72,12 +71,6 @@ var draw = function(current) {
 	ctx.beginPath();
 	ctx.arc(50, 50, 30, -(quart), ((circ) * current) - quart, false);
 	ctx.stroke();
-}
-
-function get_click_position(e) {
-  var xPosition = e.clientX;
-  var yPosition = e.clientY;
-  return [xPosition, yPosition]
 }
 
 $(document).ready(function(){
@@ -99,27 +92,39 @@ $(document).ready(function(){
 	imd = ctx.getImageData(0, 0, 100, 100);
 
 	$(document).mousedown(function(e){
-		$("#error").css('display', 'none');
-		click_pos = get_click_position(e);
-	  	interval = setInterval(function(){
-			draw(step / 100);
-			step++;
-			if (step > 100){
-			  	window.clearInterval(interval);
-			}
-	  	}, progress_speed);
+		hide_error_dialog()
+		if (state == 'calibrating'){
+			hide_error_dialog();
+			click_pos = get_click_position(e);
+		  	interval = setInterval(function(){
+				draw(step / 100);
+				step++;
+				if (step > 100){
+				  	window.clearInterval(interval);
+				}
+		  	}, progress_speed);
+		}
 	});
 
 	$(document).mouseup(function(){
-	  	ctx.clearRect(0, 0, bg.width, bg.height);
-	  	window.clearInterval(interval);
-	  	if (step < 100){
-			time_error()
-	  	}
-	  	else{
+		if (state == 'init'){
+			state = 'calibrating';
 			send('click', click_pos);
-	  	}
-	  	step = 1;
+		}
+		else if (state == 'calibrating'){
+		  	ctx.clearRect(0, 0, bg.width, bg.height);
+		  	window.clearInterval(interval);
+		  	if (step < 100){
+				time_dialog();
+		  	}
+		  	else{
+				send('click', click_pos);
+		  	}
+		  	step = 1;
+		}
+		if (state == 'end'){
+			send('click', click_pos);
+		}
 	});
 });
 
