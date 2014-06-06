@@ -1,78 +1,62 @@
-h1{
-	display: inline-block;
+body {
+  background-color: #eeeeee;
 }
-
-.header img{
-	float: right;
+.container {
+  width: 60%;
+  margin-top: 10%;
 }
-
-.header h1{
-	color: #0197fd;
-	margin-left: 0;
-	font-weight: bold;
+.column {
+  margin: 0 auto;
+  width: auto;
 }
-
-.header{
-	margin-bottom: 40px;
-	margin-top: 40px;
+.column .row {
+  text-align: center;
+  margin: 0 auto;
 }
-
-.alert{
-	margin-top: 60px;
-	display: none;
-	text-align: center;
+.indicator {
+  display: none;
+  left: -100px;
+  top: -100px;
 }
-
-
-body{
-	//background: url(../img/fondo_rayas.png);
+.logo {
+  background-image: url('img/logo_votar_grande.png');
+  width: 40%;
 }
-
-.container{
-	background-color: rgba(255,255,255,.9);
-	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px;
-	max-width: 450px;
-	height: 100%;
-	margin: 0 auto;
+.title {
+  font-size: 48px;
+  font-weight: bold;
+  color: #0197fd;
+  text-align: center;
 }
-
-.loading, .loading-touch{
-	text-align: center;
-	padding-top: 40px;
+.dialog {
+  display: none;
+  margin: 5px;
+  padding: 5px;
+  border: 0px solid;
+  border-radius: 10px;
 }
-
-.indicators{
-	display: none;
+.error {
+  background-color: rgba(210, 22, 22, 0.6);
+  border: 1px solid;
+  border-color: rgba(164, 17, 17, 0.6);
 }
-
-#pointer{
-	position: absolute;
-	left: -100px;
-	top: -100px;
+.success {
+  background-color: rgba(35, 210, 35, 0.6);
+  border: 1px solid;
+  border-color: rgba(28, 166, 28, 0.6);
 }
-
-#progress{
-	position: absolute;
-	//top: 35%;
-	//left: 70%;
+#timer {
+  display: none;
 }
-
-.start{
-	display: none;
+#pointer {
+  position: absolute;
+  left: -100px;
+  top: -100px;
+  width: 48px;
+  height: 48px;
 }
-
-.success{
-	display: none;
-}
-
-.loading{
-	display: none;
-}
-
-.dialog{
-	color: #0197fd;
-	margin-left: 0;
-	font-weight: bold;
-	font-size: 16px;
+#progress {
+  position: absolute;
+  left: -100px;
+  top: -100px;
 }
