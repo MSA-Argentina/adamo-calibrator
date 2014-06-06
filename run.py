@@ -37,10 +37,10 @@ if args.list:
         print("\tId: {0:2}\tName: {1}".format(id, name))
     quit()
 
-if args.gui == 'web':
-    from ui.run_zaguan import run_web as run
-else:
+if args.gui == 'gtk':
     from ui.run_gtk import run_gtk as run
+else:
+    from ui.run_zaguan import run_web as run
 
 print args
 
