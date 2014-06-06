@@ -9,7 +9,6 @@ class CalibratorControllerActions(BaseActionController):
         self.controller.initiate(data)
 
     def click(self, data):
-        print "Click:", data
         self.controller.register_click(data)
 
     def timeout(self, data):
