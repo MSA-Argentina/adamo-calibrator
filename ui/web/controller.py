@@ -59,17 +59,17 @@ class CalibratorController(WebContainerController):
         elif state == 'calibrating':
             error = self.calibrator.add_click(data)
             if error is None:
-                print "Click valid: ", data
+                print _("valid_click_detected"), data
                 next = self.calibrator.get_next_point()
                 if next is None:
                     self.finish()
                 else:
                     self.send_command('move_pointer', next)
             elif error == 'misclick':
-                print "Error. Misclick detected: ", data
+                print _("misclick_detected"), data
                 self.send_command('error', error)
             elif error == 'doubleclick':
-                print "Error. Doubleclick detected: ", data
+                print _("doubleclick_detected"), data
                 self.send_command('error', error)
         elif state == 'end':
             self.quit(data)
