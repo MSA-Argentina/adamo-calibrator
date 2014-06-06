@@ -12,6 +12,9 @@ class CalibratorControllerActions(BaseActionController):
         print "Click:", data
         self.controller.register_click(data)
 
+    def timeout(self, data):
+        self.controller.quit(data)
+
     def log(self, data):
         """Action executed when 'log' is called and debug is True."""
         if DEBUG:

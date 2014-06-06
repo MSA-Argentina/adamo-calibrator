@@ -16,18 +16,20 @@
             <img class="indicator" id="pointer" src="img/pointer.png" alt="pointer">
             <canvas class="indicator" id="progress" width="100" height="100"></canvas>
             <div class="container">
-                <div class="row">
-                    <div class="col-md-12 header">
-                        <h1 id="title"></h1>
+                <div class="column">
+                    <div class="row">
+                        <img class="logo" id="logo" src="img/logo_votar_grande.png">
+                        <div class="title "id="title"></div>
                     </div>
 
-                    <div class="col-md-12">
+                    <div class="row">
                         <div class="dialog start" id="init_msg"></div>
                         <div class="dialog loading" id="calibration_msg"></div>
-                        <div class="alert alert-danger" id="error_misclick"></div>
-                        <div class="alert alert-danger" id="error_doubleclick"></div>
-                        <div class="alert alert-danger" id="error_time"></div>
+                        <div class="dialog error" id="error_misclick"></div>
+                        <div class="dialog error" id="error_doubleclick"></div>
+                        <div class="dialog error" id="error_time"></div>
                         <div class="dialog success" id="finish_msg"></div>
+                        <div class="dialog timer" id="timer"></div>
                     </div>
                 </div>
             </div>

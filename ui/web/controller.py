@@ -40,7 +40,7 @@ class CalibratorController(WebContainerController):
         data['fast_start'] = self.fast_start
         data['state'] = self.state
         data['next'] = next
-        data['locale'] = get_base_data()
+        data['locale'] = get_base_data(self.timeout)
 
         self.send_command('ready', data)
 
@@ -72,4 +72,7 @@ class CalibratorController(WebContainerController):
                 print "Error. Doubleclick detected: ", data
                 self.send_command('error', error)
         elif state == 'end':
-            quit()
+            self.quit(data)
+
+    def quit(self, data):
+        quit()

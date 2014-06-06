@@ -10,7 +10,10 @@ var interval = null;
 var progress_speed = 10
 
 var state = null;
-var timeout = null;
+var max_timeout = null;
+
+var	timeout = null
+var timeout_value = 0;
 
 function click(e){
 	var click_pos = get_click_position(e);
@@ -43,34 +46,56 @@ function initiate(){
 
 function ready(data) {
 	set_locale(data.locale)
-	timeout = data.timeout;
+	max_timeout = data.timeout;
 	state = data.state
 	if (data.fast_start){
 		move_pointer(data.next);
+		show_calibration_msg();
+	}
+	else{
+		show_init_msg()
 	}
   	show_indicators();
-  	show_calibration_msg();
+
+  	if (max_timeout != 0){
+  		show_timer();
+		timeout = setInterval(_timeout, progress_speed);
+	}
 }
 
 function end(){
 	state = 'end';
 	end_dialog();
+	hide_timer();
+	window.clearInterval(timeout);
 }
 
 function error(type){
 	if (type == 'misclick'){
-		misclick_dialog();
+		show_misclick_error();
 	}
 	else if (type == 'doubleclick'){
-		doubleclick_dialog();
+		show_doubleclick_error();
 	}
 }
 
-var draw = function(current) {
+function draw(current) {
 	ctx.putImageData(imd, 0, 0);
 	ctx.beginPath();
 	ctx.arc(50, 50, 30, -(quart), ((circ) * current) - quart, false);
 	ctx.stroke();
+}
+
+function _timeout(){
+	if (timeout_value <= max_timeout){
+		var sec = max_timeout / 1000 - ((timeout_value / 1000) >> 0)
+		update_timer(sec);
+		timeout_value += progress_speed;
+	}
+	else{
+		window.clearInterval(timeout);
+		send('timeout');
+	}
 }
 
 $(document).ready(function(){
@@ -92,9 +117,12 @@ $(document).ready(function(){
 	imd = ctx.getImageData(0, 0, 100, 100);
 
 	$(document).mousedown(function(e){
-		hide_error_dialog()
-		if (state == 'calibrating'){
+		if (state == 'init'){
+			hide_init_msg();
+		}
+		else if (state == 'calibrating'){
 			hide_error_dialog();
+			show_calibration_msg();
 			click_pos = get_click_position(e);
 		  	interval = setInterval(function(){
 				draw(step / 100);
@@ -104,26 +132,37 @@ $(document).ready(function(){
 				}
 		  	}, progress_speed);
 		}
+		if (max_timeout != 0){
+			timeout_value = 0;
+			window.clearInterval(timeout);
+		}
 	});
 
 	$(document).mouseup(function(){
 		if (state == 'init'){
 			state = 'calibrating';
 			send('click', click_pos);
+			show_calibration_msg();
 		}
 		else if (state == 'calibrating'){
 		  	ctx.clearRect(0, 0, bg.width, bg.height);
 		  	window.clearInterval(interval);
 		  	if (step < 100){
-				time_dialog();
+				show_time_error();
 		  	}
 		  	else{
 				send('click', click_pos);
 		  	}
 		  	step = 1;
 		}
-		if (state == 'end'){
+		else if (state == 'end'){
 			send('click', click_pos);
+		}
+		if (max_timeout != 0){
+			show_timer();
+			timeout_value = 0;
+			window.clearInterval(timeout);
+			timeout = setInterval(_timeout, progress_speed);
 		}
 	});
 });
