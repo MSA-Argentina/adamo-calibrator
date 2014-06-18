@@ -42,8 +42,6 @@ if args.gui == 'gtk':
 else:
     from ui.run_zaguan import run_web as run
 
-print args
-
 run(fake=args.fake, device=args.device, misclick_threshold=args.misclick,
     dualclick_threshold=args.dualclick, finger_delta=FINGER_DELTA,
     timeout=args.timeout, fast_start=args.faststart)
