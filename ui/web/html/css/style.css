@@ -3,7 +3,7 @@ body {
 }
 .container {
   width: 60%;
-  margin-top: 10%;
+  margin: 10% auto;
 }
 .column {
   margin: 0 auto;
