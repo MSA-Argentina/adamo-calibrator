@@ -1,0 +1,26 @@
+msgid "title"
+msgstr "Adamo Calibrator"
+
+msgid "init_msg"
+msgstr "Presione la pantalla para continuar"
+
+msgid "calibration_msg"
+msgstr "Presione el puntero"
+
+msgid "finish_msg"
+msgstr "Su pantalla ha sido calibrada."
+
+msgid "valid_click_detected"
+msgstr "Click válido detectado."
+
+msgid "misclick_detected"
+msgstr "Click incorrecto detectado."
+
+msgid "doubleclick_detected"
+msgstr "Doble click detectado."
+
+msgid "time_error"
+msgstr "Por favor mantenga presionado el puntero más tiempo."
+
+msgid "wait"
+msgstr " o espere {} segundos para salir."
