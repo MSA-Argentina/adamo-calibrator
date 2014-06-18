@@ -1,5 +1,5 @@
 from os import popen
-from settings import TEST
+from settings import FAKE, TEST
 
 
 class XInput(object):
@@ -46,5 +46,5 @@ class XInput(object):
     @staticmethod
     def set_prop(dev_id, property, data):
         print('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
-        if not TEST:
+        if not FAKE and not TEST:
             popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
