@@ -17,11 +17,14 @@ INTERVAL = 50
 
 load_locales()
 
+# TODO:
+# Implement auto_close
+
 
 class Window():
 
     def __init__(self, fake, device, misclick_threshold, dualclick_threshold,
-                 finger_delta, timeout, fast_start):
+                 finger_delta, timeout, fast_start, auto_close):
         gtk.gdk.threads_init()
         self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
         self.window.connect("destroy", gtk.main_quit)

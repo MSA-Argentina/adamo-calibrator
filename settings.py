@@ -1,4 +1,5 @@
 TEST = False
+FAKE = True
 
 DEBUG = True
 FULLSCREEN = True
@@ -17,3 +18,4 @@ DEFAULT_LOCALE = 'en_US'
 RESOURCES_PATH = './resources'
 
 FAST_START = True
+AUTO_CLOSE = True

@@ -12,8 +12,9 @@ var progress_speed = 10
 var state = null;
 var max_timeout = null;
 
-var	timeout = null
+var	timeout = null;
 var timeout_value = 0;
+var auto_close = null;
 
 function click(e){
 	var click_pos = get_click_position(e);
@@ -47,7 +48,8 @@ function initiate(){
 function ready(data) {
 	set_locale(data.locale)
 	max_timeout = data.timeout;
-	state = data.state
+	state = data.state;
+	auto_close = data.auto_close;
 	if (data.fast_start){
 		move_pointer(data.next);
 		show_calibration_msg();
@@ -68,6 +70,11 @@ function end(){
 	end_dialog();
 	hide_timer();
 	window.clearInterval(timeout);
+	if (auto_close){
+		timeout = setTimeout(function(){
+			send('timeout');
+		}, 3000);
+	}
 }
 
 function error(type){
@@ -155,7 +162,7 @@ $(document).ready(function(){
 		  	}
 		  	step = 1;
 		}
-		else if (state == 'end'){
+		else if ((state == 'end') && !(auto_close)){
 			send('click', click_pos);
 		}
 		if (max_timeout != 0){

@@ -12,7 +12,7 @@ load_locales()
 class CalibratorController(WebContainerController):
 
     def __init__(self, fake, device, misclick_threshold, dualclick_threshold,
-                 finger_delta, timeout, fast_start):
+                 finger_delta, timeout, fast_start, auto_close):
         WebContainerController.__init__(self)
         instance = CalibratorControllerActions(controller=self)
         self.add_processor("calibrator", instance)
@@ -23,6 +23,7 @@ class CalibratorController(WebContainerController):
 
         self.timeout = timeout
         self.fast_start = fast_start
+        self.auto_close = auto_close
         self.state = None
 
     def initiate(self, data):
@@ -38,6 +39,7 @@ class CalibratorController(WebContainerController):
 
         data['timeout'] = self.timeout
         data['fast_start'] = self.fast_start
+        data['auto_close'] = self.auto_close
         data['state'] = self.state
         data['next'] = next
         data['locale'] = get_base_data(self.timeout)

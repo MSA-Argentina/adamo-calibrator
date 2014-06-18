@@ -40,10 +40,10 @@ class Window(Zaguan):
 
 
 def run_web(fake, device, misclick_threshold, dualclick_threshold,
-            finger_delta, timeout, fast_start):
+            finger_delta, timeout, fast_start, auto_close):
     controller = CalibratorController(fake, device, misclick_threshold,
                                       dualclick_threshold, finger_delta,
-                                      timeout, fast_start)
+                                      timeout, fast_start, auto_close)
     cur_dir = os.path.dirname(os.path.abspath(__file__))
     file_ = os.path.join(cur_dir, 'web/html/index.html')
     uri = 'file://' + urllib.pathname2url(file_)

@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 
 from settings import FAST_START, MISCLICK_THRESHOLD, DUALCLICK_THRESHOLD, \
-    TIMEOUT, FINGER_DELTA
+    TIMEOUT, FINGER_DELTA, AUTO_CLOSE
 
 parser = ArgumentParser()
 group_ui = parser.add_mutually_exclusive_group()
@@ -17,7 +17,9 @@ parser.add_argument('--dualclick', type=int, metavar='threshold',
 parser.add_argument('--misclick', type=int, metavar='threshold',
                     default=MISCLICK_THRESHOLD, help='Set misclick threshold.')
 parser.add_argument('--faststart', action="store_true", default=FAST_START,
-                    help="Use a fake device.")
+                    help="Start calibrating.")
+parser.add_argument('--autoclose', action="store_true", default=AUTO_CLOSE,
+                    help="Close without user click.")
 group_ui.add_argument('-g', '--gui', choices=['gtk', 'web'],
                       help='Set GUI.')
 group_ui.add_argument('-l', '--list', action="store_true",
@@ -44,4 +46,4 @@ else:
 
 run(fake=args.fake, device=args.device, misclick_threshold=args.misclick,
     dualclick_threshold=args.dualclick, finger_delta=FINGER_DELTA,
-    timeout=args.timeout, fast_start=args.faststart)
+    timeout=args.timeout, fast_start=args.faststart, auto_close=args.autoclose)
