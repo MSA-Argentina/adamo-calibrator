@@ -1,0 +1,9 @@
+recursive-include adamo_calibrator/ui/web/html *.html
+recursive-include adamo_calibrator/ui/web/html *.js
+recursive-include adamo_calibrator/ui/web/html *.css
+recursive-include adamo_calibrator/ui/web/html *.less
+recursive-include adamo_calibrator/ui/web/html *.png
+recursive-include adamo_calibrator/resources *.po
+recursive-include adamo_calibrator/calibrator *.py
+recursive-include adamo_calibrator/export *.py
+recursive-include adamo_calibrator/ui *.py
