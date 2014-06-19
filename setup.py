@@ -16,9 +16,6 @@ setup(
     author_email='nillia@msa.com.ar',
     packages=['adamo_calibrator'],
     include_package_data=True,
-    package_data={
-        'adamo_calibrator/ui/web/html': ['*'],
-    },
     scripts=[],
     url='http://pypi.python.org/pypi/---/',
     license='LICENSE.txt',
