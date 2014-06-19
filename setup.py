@@ -22,4 +22,7 @@ setup(
     description='A Python touchscreen calibrator.',
     long_description=open('README.txt').read(),
     install_requires=["zaguan"],
+    entry_points={
+        'console_scripts': ['adamo-calibrator = adamo_calibrator.run']
+    },
 )
