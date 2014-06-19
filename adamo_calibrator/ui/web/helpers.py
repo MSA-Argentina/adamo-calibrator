@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from ui.helpers import load_locales
+from adamo_calibrator.ui.helpers import load_locales
 
 load_locales()
 

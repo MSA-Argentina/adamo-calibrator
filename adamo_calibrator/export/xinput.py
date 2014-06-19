@@ -1,5 +1,5 @@
 from os import popen
-from settings import FAKE, TEST
+from adamo_calibrator.settings import FAKE, TEST
 
 
 class XInput(object):

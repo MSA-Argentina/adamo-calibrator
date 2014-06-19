@@ -9,9 +9,9 @@ pygtk.require('2.0')
 from gobject import source_remove, timeout_add
 from pango import FontDescription
 
-from calibrator.calibrator import Calibrator
-from settings import DEBUG, FULLSCREEN, NPOINTS
-from ui.helpers import load_locales
+from adamo_calibrator.calibrator.calibrator import Calibrator
+from adamo_calibrator.settings import DEBUG, FULLSCREEN, NPOINTS
+from adamo_calibrator.ui.helpers import load_locales
 
 INTERVAL = 50
 

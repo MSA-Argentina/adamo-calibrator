@@ -1,5 +1,5 @@
 from zaguan.actions import BaseActionController
-from settings import DEBUG
+from adamo_calibrator.settings import DEBUG
 
 
 class CalibratorControllerActions(BaseActionController):

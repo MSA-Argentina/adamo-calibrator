@@ -1,4 +1,4 @@
-from ui.gtk.controller import Window
+from adamo_calibrator.ui.gtk.controller import Window
 
 
 def run_gtk(fake=None, device=None, misclick_threshold=None,

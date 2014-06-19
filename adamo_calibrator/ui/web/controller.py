@@ -1,10 +1,10 @@
 from zaguan.controller import WebContainerController
-from ui.web.actions import CalibratorControllerActions
+from adamo_calibrator.ui.web.actions import CalibratorControllerActions
 
-from calibrator.calibrator import Calibrator
-from settings import NPOINTS
-from ui.helpers import load_locales
-from ui.web.helpers import get_base_data
+from adamo_calibrator.calibrator.calibrator import Calibrator
+from adamo_calibrator.settings import NPOINTS
+from adamo_calibrator.ui.helpers import load_locales
+from adamo_calibrator.ui.web.helpers import get_base_data
 
 load_locales()
 

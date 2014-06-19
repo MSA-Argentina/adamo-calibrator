@@ -15,7 +15,7 @@ TIMEOUT = 0
 # Internationalization Settings
 PO_NAME = 'calibrator'
 DEFAULT_LOCALE = 'en_US'
-RESOURCES_PATH = './resources'
+RESOURCES_PATH = 'adamo_calibrator/resources'
 
 FAST_START = True
 AUTO_CLOSE = True

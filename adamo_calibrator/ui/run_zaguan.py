@@ -1,18 +1,11 @@
-#try:
-#    import gtk
-#except ImportError:
-#    print "You don't have GTK installed"
-#
-#import pygtk
-#pygtk.require('2.0')
 from zaguan import gtk
 import os
 import urllib
 
 from time import sleep
 from zaguan import Zaguan
-from ui.web.controller import CalibratorController
-from settings import FULLSCREEN
+from adamo_calibrator.ui.web.controller import CalibratorController
+from adamo_calibrator.settings import FULLSCREEN
 
 
 class Window(Zaguan):

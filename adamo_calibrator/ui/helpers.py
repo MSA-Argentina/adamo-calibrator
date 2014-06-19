@@ -1,7 +1,7 @@
 from gettext import translation
 
 from os.path import join
-from settings import DEFAULT_LOCALE, RESOURCES_PATH, PO_NAME
+from adamo_calibrator.settings import DEFAULT_LOCALE, RESOURCES_PATH, PO_NAME
 
 LOCALE_PATH = join(RESOURCES_PATH, 'locale')
 
