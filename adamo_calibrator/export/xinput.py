@@ -20,12 +20,16 @@ class XInput(object):
             if prop in stdout:
                 stdout = stdout.split('\n')
                 for property in stdout:
-                    if prop in property and '<no items>' not in property:
-                        if id_only:
-                            devices.append(id)
+                    if prop in property:
+                        if '<no items>' not in property:
+                            setted = False
                         else:
-                            devices.append((dev_names[i], id))
-                        break
+                            setted = True
+
+                        if id_only:
+                            devices.append((id, setted))
+                        else:
+                            devices.append((dev_names[i], id, setted))
         return devices
 
     @staticmethod
@@ -42,6 +46,20 @@ class XInput(object):
                     value = value.split(',')
                     break
         return value
+
+    @staticmethod
+    def get_prop_range(dev_id):
+        value = []
+        proc = popen('xinput list --long  %s' % dev_id)
+        stdout = proc.read()
+        stdout = stdout.split('\n')
+        for line in stdout:
+            if 'Range' in line:
+                str_range = line.split(':')[1]
+                str_range = str_range.replace(' ', '')
+                axis_range = str_range.split('-')
+                value += axis_range
+        return value[:4]
 
     @staticmethod
     def set_prop(dev_id, property, data):

@@ -43,14 +43,22 @@ class Calibrator:
             exit()
         if len(devices) > 1:
             print "More than one devices detected. Using last."
-            self.device = devices[0]
+
+        (self.device, setted) = devices[-1]
+        if setted:
+            self.get_device_prop()
         else:
-            self.device = devices[0]
-        self.get_device_prop()
+            self.get_device_prop_range()
 
     def get_device_prop(self):
         self.old_prop_value = XInput.get_prop(self.device,
                                               'Evdev Axis Calibration')
+        #If length of old_prop_value is lower than 4, get axis range
+        if len(self.old_prop_value) < 4:
+            self.get_device_prop_range()
+
+    def get_device_prop_range(self):
+        self.old_prop_value = XInput.get_prop_range(self.device)
 
     def set_screen_prop(self, width, height):
         #This function set the screen width and height and realize some
@@ -72,10 +80,10 @@ class Calibrator:
         width = self.width
         height = self.height
 
-        old_xmin = int(self.old_prop_value[0])
-        old_xmax = int(self.old_prop_value[1])
-        old_ymin = int(self.old_prop_value[2])
-        old_ymax = int(self.old_prop_value[3])
+        old_xmin = int(float(self.old_prop_value[0]))
+        old_xmax = int(float(self.old_prop_value[1]))
+        old_ymin = int(float(self.old_prop_value[2]))
+        old_ymax = int(float(self.old_prop_value[3]))
 
         clicks = self.clicks
         clicks_x = [clicks[x, y][0] for x, y in clicks]
