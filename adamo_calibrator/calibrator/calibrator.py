@@ -146,6 +146,15 @@ class Calibrator:
 
         return misclick
 
+    def reset(self):
+        width = self.width
+        height = self.height
+        self.clicks = {}
+        self.points = []
+        self.points_clicked = []
+        self.nclicks = 0
+        self.set_screen_prop(width, height)
+
     def check_axis(self, x, y):
         #This function checks if a inversion of axis or swapping of axis is
         #needed.

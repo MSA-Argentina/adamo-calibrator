@@ -52,6 +52,12 @@ class CalibratorController(WebContainerController):
         self.calibrator.calc_new_axis()
         self.calibrator.finish()
 
+    def reset(self):
+        self.nerror = 0
+        self.calibrator.reset()
+        next = self.calibrator.get_next_point()
+        self.send_command('move_pointer', next)
+
     def register_click(self, data):
         state = self.state
         if state == 'init':
@@ -68,9 +74,15 @@ class CalibratorController(WebContainerController):
                 else:
                     self.send_command('move_pointer', next)
             elif error == 'misclick':
+                self.nerror += 1
+                if self.nerror >= 3:
+                    self.reset()
                 print _("misclick_detected"), data
                 self.send_command('error', error)
             elif error == 'doubleclick':
+                self.nerror += 1
+                if self.nerror >= 3:
+                    self.reset()
                 print _("doubleclick_detected"), data
                 self.send_command('error', error)
         elif state == 'end':
