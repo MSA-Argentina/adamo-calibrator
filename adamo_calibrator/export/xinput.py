@@ -9,6 +9,10 @@ class XInput(object):
         proc = popen('xinput list --id-only')
         stdout = proc.read()
         dev_ids = stdout.split('\n')[0:-1]
+
+        #Searching Virtual core keboard.
+        idx = dev_ids.index('3')
+        dev_ids = dev_ids[:idx]
         if not id_only:
             proc = popen('xinput list --name-only')
             stdout = proc.read()
