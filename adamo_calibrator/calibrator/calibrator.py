@@ -45,10 +45,13 @@ class Calibrator:
             print "More than one devices detected. Using last."
 
         (self.device, setted) = devices[-1]
-        if setted:
-            self.get_device_prop()
-        else:
-            self.get_device_prop_range()
+        #if setted:
+        #    self.get_device_prop()
+        #else:
+        self.get_device_prop_range()
+        # This reset calibration to defaults values because recalibration
+        # errors
+        self.reset_calibration()
 
     def get_device_prop(self):
         self.old_prop_value = XInput.get_prop(self.device,
@@ -59,6 +62,17 @@ class Calibrator:
 
     def get_device_prop_range(self):
         self.old_prop_value = XInput.get_prop_range(self.device)
+
+    def reset_calibration(self):
+        xinput = XInput()
+        xinput.set_prop(self.device, '"Evdev Axes Swap"', '0')
+        xinput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
+        xinput.set_prop(self.device, '"Evdev Axis Calibration"',
+                        '{0} {1} {2} {3}'.format(
+                            int(float(self.old_prop_value[0])),
+                            int(float(self.old_prop_value[1])),
+                            int(float(self.old_prop_value[2])),
+                            int(float(self.old_prop_value[3]))))
 
     def set_screen_prop(self, width, height):
         #This function set the screen width and height and realize some
