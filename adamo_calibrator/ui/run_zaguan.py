@@ -38,7 +38,8 @@ def run_web(fake, device, misclick_threshold, dualclick_threshold,
                                       dualclick_threshold, finger_delta,
                                       timeout, fast_start, auto_close,
                                       resources_path)
-    file_ = os.path.join(resources_path, 'theme/index.html')
+    #file_ = os.path.join(resources_path, 'theme/index.html')
+    file_ = os.path.join(os.path.split(__file__)[0], 'web/html/index.html')
     uri = 'file://' + urllib.pathname2url(file_)
     zaguan = Window(uri, controller)
     zaguan.run()
