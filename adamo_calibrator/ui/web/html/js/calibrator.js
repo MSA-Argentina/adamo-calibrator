@@ -15,6 +15,7 @@ var max_timeout = null;
 var	timeout = null;
 var timeout_value = 0;
 var auto_close = null;
+var verification_point = null;
 
 function click(e){
 	var click_pos = get_click_position(e);
@@ -46,10 +47,15 @@ function initiate(){
 
 
 function ready(data) {
-	set_locale(data.locale)
+    if(!data.mostrar_cursor){
+        $("html").css("cursor", "none");
+    }
+	set_locale(data.locale);
 	max_timeout = data.timeout;
 	state = data.state;
 	auto_close = data.auto_close;
+	verification_point = data.verification_point;
+	console.log(verification_point)
 	if (data.fast_start){
 		move_pointer(data.next);
 		show_calibration_msg();
@@ -65,16 +71,23 @@ function ready(data) {
 	}
 }
 
+function check_calibration(){
+	state = 'checking';
+	$("#pointer").css("background-image", "url(img/puntero_confirmar.png)");
+	move_pointer([verification_point[0], verification_point[1]]);
+}
+
 function end(){
 	state = 'end';
 	end_dialog();
 	hide_timer();
 	window.clearInterval(timeout);
-	if (auto_close){
-		timeout = setTimeout(function(){
-			send('timeout');
-		}, 3000);
-	}
+	check_calibration();
+	//if (auto_close){
+	//	timeout = setTimeout(function(){
+	//		send('timeout');
+	//	}, 3000);
+	//}
 }
 
 function error(type){
@@ -84,6 +97,14 @@ function error(type){
 	else if (type == 'doubleclick'){
 		show_doubleclick_error();
 	}
+}
+
+function reset(data){
+	verification_point = data;
+	hide_all();
+	show_calibration_msg();
+	$("#pointer").css("background-image", "url(img/puntero.png)");
+	state = 'calibrating';
 }
 
 function draw(current) {
@@ -122,7 +143,6 @@ $(document).ready(function(){
 	ctx.lineWidth = 10.0;
 
 	imd = ctx.getImageData(0, 0, 100, 100);
-
 	$(document).mousedown(function(e){
 		if (state == 'init'){
 			hide_init_msg();
@@ -138,6 +158,10 @@ $(document).ready(function(){
 				  	window.clearInterval(interval);
 				}
 		  	}, progress_speed);
+		}
+		else if (state == 'checking'){
+			hide_error_dialog();
+			click_pos = get_click_position(e);
 		}
 		if (max_timeout != 0){
 			timeout_value = 0;
@@ -162,7 +186,7 @@ $(document).ready(function(){
 		  	}
 		  	step = 1;
 		}
-		else if ((state == 'end') && !(auto_close)){
+		else if (((state == 'end') && !(auto_close)) || (state == 'checking')){
 			send('click', click_pos);
 		}
 		if (max_timeout != 0){
