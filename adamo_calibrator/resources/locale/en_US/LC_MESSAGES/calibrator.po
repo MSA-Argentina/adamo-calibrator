@@ -5,10 +5,10 @@ msgid "init_msg"
 msgstr "Please touch screen for start"
 
 msgid "calibration_msg"
-msgstr "Please touch the pointer"
+msgstr "Please mantain pressed the pointer"
 
 msgid "finish_msg"
-msgstr "Your screen is now calibrated."
+msgstr "To check the calibration, press the yellow dot, if it is not successful the calibration process will restart."
 
 msgid "valid_click_detected"
 msgstr "Valid click detected."
@@ -20,7 +20,7 @@ msgid "doubleclick_detected"
 msgstr "Doubleclick detected."
 
 msgid "time_error"
-msgstr "Please maintain pressed the pointer more time.."
+msgstr "Please maintain pressed the pointer more time."
 
 msgid "wait"
 msgstr " or wait {} seconds for exit."
