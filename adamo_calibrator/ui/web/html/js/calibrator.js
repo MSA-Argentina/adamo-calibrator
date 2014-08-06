@@ -47,7 +47,7 @@ function initiate(){
 
 
 function ready(data) {
-    if(!data.mostrar_cursor){
+    if(!data.show_cursor){
         $("html").css("cursor", "none");
     }
 	set_locale(data.locale);
@@ -55,7 +55,6 @@ function ready(data) {
 	state = data.state;
 	auto_close = data.auto_close;
 	verification_point = data.verification_point;
-	console.log(verification_point)
 	if (data.fast_start){
 		move_pointer(data.next);
 		show_calibration_msg();

@@ -4,7 +4,7 @@ from zaguan.controller import WebContainerController
 from adamo_calibrator.ui.web.actions import CalibratorControllerActions
 
 from adamo_calibrator.calibrator.calibrator import Calibrator
-from adamo_calibrator.settings import NPOINTS, MOSTRAR_CURSOR
+from adamo_calibrator.settings import NPOINTS, SHOW_CURSOR
 from adamo_calibrator.ui.helpers import load_locales
 #from adamo_calibrator.ui.web.helpers import get_base_data
 
@@ -63,7 +63,7 @@ class CalibratorController(WebContainerController):
 
         self._calc_verification_point(width, height)
 
-        data['mostrar_cursor'] = MOSTRAR_CURSOR
+        data['show_cursor'] = SHOW_CURSOR
         data['timeout'] = self.timeout
         data['fast_start'] = self.fast_start
         data['auto_close'] = self.auto_close
