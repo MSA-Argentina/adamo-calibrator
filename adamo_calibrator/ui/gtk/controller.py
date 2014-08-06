@@ -19,6 +19,7 @@ load_locales()
 
 # TODO:
 # Implement auto_close
+# Implement reset by errors.
 
 
 class Window():

@@ -3,7 +3,13 @@ recursive-include adamo_calibrator/ui/web/html *.js
 recursive-include adamo_calibrator/ui/web/html *.css
 recursive-include adamo_calibrator/ui/web/html *.less
 recursive-include adamo_calibrator/ui/web/html *.png
+recursive-include adamo_calibrator/resources/theme *.html
+recursive-include adamo_calibrator/resources/theme *.js
+recursive-include adamo_calibrator/resources/theme *.css
+recursive-include adamo_calibrator/resources/theme *.less
+recursive-include adamo_calibrator/resources/theme *.png
 recursive-include adamo_calibrator/resources *.po
+recursive-include adamo_calibrator/resources *.mo
 recursive-include adamo_calibrator/calibrator *.py
 recursive-include adamo_calibrator/export *.py
 recursive-include adamo_calibrator/ui *.py

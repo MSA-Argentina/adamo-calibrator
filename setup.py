@@ -10,16 +10,16 @@ except ImportError:
     from setuptools import setup, find_packages
 
 setup(
-    name='Adamo Calibrator',
-    version='0.0.1',
-    author='Nicolás Illia',
+    name='adamo_calibrator',
+    version='0.0.5',
+    author='Nicolas Illia',
     author_email='nillia@msa.com.ar',
     packages=['adamo_calibrator'],
     include_package_data=True,
     scripts=[],
-    url='http://pypi.python.org/pypi/---/',
+    url='https://pypi.python.org/pypi/adamo_calibrator',
     license='LICENSE.txt',
-    description='A Python touchscreen calibrator.',
+    description='A touchscreen calibrator.',
     long_description=open('README.txt').read(),
     install_requires=["zaguan"],
     entry_points={

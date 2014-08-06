@@ -8,18 +8,19 @@ LOCALE_PATH = join(RESOURCES_PATH, 'locale')
 _actual_locale = DEFAULT_LOCALE
 
 
-def load_locales():
-    reset_locales()
+def load_locales(resources_path):
+    locale_path = join(resources_path, 'locale')
+    reset_locales(locale_path)
 
 
-def reset_locales():
-    change_locale(DEFAULT_LOCALE)
+def reset_locales(locale_path):
+    change_locale(DEFAULT_LOCALE, locale_path)
 
 
-def change_locale(locale):
+def change_locale(locale, locale_path):
     global _actual_locale
     _actual_locale = locale
-    language = translation(PO_NAME, LOCALE_PATH, [locale])
+    language = translation(PO_NAME, locale_path, [locale])
     language.install()
 
 

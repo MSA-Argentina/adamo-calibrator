@@ -1,7 +1,8 @@
 from argparse import ArgumentParser
+from os.path import abspath
 
 from adamo_calibrator.settings import FAST_START, MISCLICK_THRESHOLD, \
-    DUALCLICK_THRESHOLD, TIMEOUT, FINGER_DELTA, AUTO_CLOSE
+    DUALCLICK_THRESHOLD, TIMEOUT, FINGER_DELTA, AUTO_CLOSE, RESOURCES_PATH
 
 parser = ArgumentParser()
 group_ui = parser.add_mutually_exclusive_group()
@@ -27,7 +28,9 @@ group_ui.add_argument('-l', '--list', action="store_true",
 parser.add_argument('--timeout', type=int, metavar='milliseconds',
                     default=TIMEOUT,
                     help='Set timeout in milliseconds. (0 for disable)')
-
+parser.add_argument('--resources-path', metavar='path',
+                    default=RESOURCES_PATH,
+                    help='Set path for custom resources (Only on web gui).')
 args = parser.parse_args()
 
 if args.list:
@@ -46,4 +49,5 @@ else:
 
 run(fake=args.fake, device=args.device, misclick_threshold=args.misclick,
     dualclick_threshold=args.dualclick, finger_delta=FINGER_DELTA,
-    timeout=args.timeout, fast_start=args.faststart, auto_close=args.autoclose)
+    timeout=args.timeout, fast_start=args.faststart, auto_close=args.autoclose,
+    resources_path=abspath(args.resources_path))

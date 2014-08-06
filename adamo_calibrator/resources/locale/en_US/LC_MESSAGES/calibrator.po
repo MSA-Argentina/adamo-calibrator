@@ -8,7 +8,7 @@ msgid "calibration_msg"
 msgstr "Please touch the pointer"
 
 msgid "finish_msg"
-msgstr "Your screen are now calibrated."
+msgstr "Your screen is now calibrated."
 
 msgid "valid_click_detected"
 msgstr "Valid click detected."
