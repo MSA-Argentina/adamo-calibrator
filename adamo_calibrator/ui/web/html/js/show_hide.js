@@ -62,6 +62,9 @@ function hide_all(){
     hide_error_dialog();
     hide_indicators();
     $("#calibration_msg").css('display', 'none');
+    $("#init_msg").css('display', 'none');
+    $(".indicators").css('display', 'none');
+    $(".success").css('display', 'none');
 }
 
 function end_dialog(){
