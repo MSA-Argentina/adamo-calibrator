@@ -64,6 +64,10 @@ class Calibrator:
         self.old_prop_value = XInput.get_prop_range(self.device)
 
     def reset_calibration(self):
+        self.swapxy = False
+        self.inversex = False
+        self.inversey = False
+
         xinput = XInput()
         xinput.set_prop(self.device, '"Evdev Axes Swap"', '0')
         xinput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
@@ -161,6 +165,7 @@ class Calibrator:
         return misclick
 
     def reset(self):
+        self.reset_calibration()
         width = self.width
         height = self.height
         self.clicks = {}
