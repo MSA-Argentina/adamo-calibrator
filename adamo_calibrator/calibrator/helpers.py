@@ -1,5 +1,12 @@
 
 def calc_quadrant(w, h, x, y):
+    """ Screen Quadrants
+        +---+---+
+        | 3 | 4 |
+        +---+---+
+        | 2 | 1 |
+        +---+---+
+    """
     if (x - w / 2) > 0 and (y - h / 2) < 0:
         quadrant = 1
     elif (x - w / 2) < 0 and (y - h / 2) < 0:
