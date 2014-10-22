@@ -30,35 +30,25 @@ class Calibrator:
             self.old_prop_value = [0, 1000, 0, 1000]
         elif device is not None:
             self.device = device
-            self.get_device_prop()
+            self.get_device_prop_range()
         else:
             self.get_device()
 
     def get_device(self):
-        #This function loads an calibratable device from xinput, if detect more
-        #than one device, this select the first.
-        devices = XInput.get_device_with_prop('Evdev Axis Calibration')
+        # This function loads an calibratable device from xinput, if detect more
+        # than one device, this select the first.
+        devices = XInput.get_device_with_prop('Evdev Axis Calibration',
+                                              False)
         if len(devices) == 0:
             print "Error: No calibratable devices found."
             exit()
         if len(devices) > 1:
             print "More than one devices detected. Using last."
 
-        (self.device, setted) = devices[-1]
-        #if setted:
-        #    self.get_device_prop()
-        #else:
         self.get_device_prop_range()
         # This reset calibration to defaults values because recalibration
         # errors
         self.reset_calibration()
-
-    def get_device_prop(self):
-        self.old_prop_value = XInput.get_prop(self.device,
-                                              'Evdev Axis Calibration')
-        #If length of old_prop_value is lower than 4, get axis range
-        if len(self.old_prop_value) < 4:
-            self.get_device_prop_range()
 
     def get_device_prop_range(self):
         self.old_prop_value = XInput.get_prop_range(self.device)
