@@ -1,0 +1,33 @@
+0.0.1
+Initial release
+
+0.0.2
+Fixing error when a device hasn't the axes preconfigured.
+
+0.0.3
+Adding method for reset process when 3 errors occurrence.
+
+0.0.4
+Fixing bugs.
+Recovering only pointers devices when searching calibratable devices.
+
+0.0.5
+Omit save setting when use fake device.
+Fixing bad recalibration bug.
+
+0.0.6
+Working on: Adding an final step to check calibration
+
+0.0.7
+Bug Fix
+Adding an final step to check calibration
+
+0.0.8
+Bug Fix
+
+0.0.9
+Bug Fix
+
+0.0.10
+Bug Fix.
+Adding compatibility.
