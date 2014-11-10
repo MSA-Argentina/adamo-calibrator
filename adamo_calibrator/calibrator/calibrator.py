@@ -233,11 +233,6 @@ class Calibrator:
         y_min = self.y_min
         y_max = self.y_max
 
-        # If the difference of the calibration is higher than X axis, the
-        # calibrator must swap axis.
-        if (y_max - y_min) > (x_max - x_min):
-            self.swapxy = True
-
         if self.swapxy:
             xinput.set_prop(self.device, '"Evdev Axes Swap"', '1')
             inversex, inversey = inversey, inversex
