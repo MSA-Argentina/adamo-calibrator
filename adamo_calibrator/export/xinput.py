@@ -70,3 +70,25 @@ class XInput(object):
         print('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
         if not FAKE and not TEST:
             popen('xinput set-prop {0} {1} {2}'.format(dev_id, property, data))
+
+    @staticmethod
+    def get_dev_vendor(dev_id):
+        cmd = 'xinput list-props {} | grep "Device Node" | cut -d ":" -f 2'.\
+            format(dev_id)
+        proc = popen(cmd)
+        stdout = proc.read().strip()
+        stdout = stdout.replace('\"', '')
+        event = stdout.split('/')[-1]
+
+        cmd = 'grep -E "Handlers|Bus=" /proc/bus/input/devices | grep -B1 ' \
+              '"{}" | head -n 1 | cut -d ":" -f 2'.format(event)
+        proc = popen(cmd)
+        stdout = proc.read().strip()
+        dev = stdout.split()
+        dev = [d.split('=')[1] for d in dev]
+        dev = {'bus': dev[0],
+               'vendor': dev[1],
+               'product': dev[2],
+               'version': dev[3]}
+
+        return dev
