@@ -45,7 +45,8 @@ class Calibrator:
         if len(devices) > 1:
             print "More than one devices detected. Using last."
 
-        self.device = devices[-1]
+        # Get device with format (Name, DevID, setted)
+        self.device = devices[-1][1]
         self.get_device_prop_range()
         # This reset calibration to defaults values because recalibration
         # errors
