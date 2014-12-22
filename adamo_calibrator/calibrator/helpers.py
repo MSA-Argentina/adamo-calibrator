@@ -2,9 +2,9 @@
 def calc_quadrant(w, h, x, y):
     """ Screen Quadrants
         +---+---+
-        | 3 | 4 |
+        | 1 | 2 |
         +---+---+
-        | 2 | 1 |
+        | 3 | 4 |
         +---+---+
     """
     if (x - w / 2) > 0 and (y - h / 2) < 0:
@@ -44,5 +44,4 @@ def scale_axis(cx, to_max, to_min, from_max, from_min):
         x = to_max
     if (x < to_min):
         x = to_min
-
     return x
