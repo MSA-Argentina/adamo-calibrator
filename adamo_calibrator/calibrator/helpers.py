@@ -1,19 +1,19 @@
 
 def calc_quadrant(w, h, x, y):
     """ Screen Quadrants
-        +---+---+
-        | 1 | 2 |
-        +---+---+
-        | 3 | 4 |
+        +---+---+       1) x < w/2 && y < h/2
+        | 1 | 2 |       2) x > w/2 && y < h/2
+        +---+---+       3) x < w/2 && y > h/2
+        | 3 | 4 |       4) x > w/2 && y > h/2
         +---+---+
     """
-    if (x - w / 2) < 0 and (y - h / 2) > 0:
+    if (x - w / 2) < 0 and (y - h / 2) < 0:
         quadrant = 1
-    elif (x - w / 2) > 0 and (y - h / 2) > 0:
-        quadrant = 2
-    elif (x - w / 2) < 0 and (y - h / 2) < 0:
-        quadrant = 3
     elif (x - w / 2) > 0 and (y - h / 2) < 0:
+        quadrant = 2
+    elif (x - w / 2) < 0 and (y - h / 2) > 0:
+        quadrant = 3
+    elif (x - w / 2) > 0 and (y - h / 2) > 0:
         quadrant = 4
     return quadrant
 
