@@ -7,13 +7,13 @@ def calc_quadrant(w, h, x, y):
         | 3 | 4 |
         +---+---+
     """
-    if (x - w / 2) > 0 and (y - h / 2) < 0:
+    if (x - w / 2) < 0 and (y - h / 2) > 0:
         quadrant = 1
-    elif (x - w / 2) < 0 and (y - h / 2) < 0:
-        quadrant = 2
-    elif (x - w / 2) < 0 and (y - h / 2) > 0:
-        quadrant = 3
     elif (x - w / 2) > 0 and (y - h / 2) > 0:
+        quadrant = 2
+    elif (x - w / 2) < 0 and (y - h / 2) < 0:
+        quadrant = 3
+    elif (x - w / 2) > 0 and (y - h / 2) < 0:
         quadrant = 4
     return quadrant
 
@@ -45,3 +45,7 @@ def scale_axis(cx, to_max, to_min, from_max, from_min):
     if (x < to_min):
         x = to_min
     return x
+
+
+def printable(a, b, c, d):
+    return '{}{}{}{}'.format(a, b, c, d)
