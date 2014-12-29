@@ -1,5 +1,6 @@
 from adamo_calibrator.calibrator.helpers import calc_quadrant, get_adyacent, \
     same_axis, scale_axis
+from adamo_calibrator.calibrator.constants import calc
 from adamo_calibrator.export.xinput import XInput
 from random import randint
 from sys import exit
@@ -24,7 +25,6 @@ class Calibrator:
         self.swapxy = False
         self.inversex = False
         self.inversey = False
-
         if fake:
             self.device = 'fake'
             self.old_prop_value = [0, 1000, 0, 1000]
@@ -166,31 +166,21 @@ class Calibrator:
         self.nclicks = 0
         self.set_screen_prop(width, height)
 
-    def check_axis(self, x, y):
+    def check_axis(self):
         # This function checks if a inversion of axis or swapping of axis is
         # needed.
-        (xp, yp) = self.points_clicked[-1]
-        quadrant_exp = calc_quadrant(self.width, self.height, xp, yp)
-        quadrant = calc_quadrant(self.width, self.height, x, y)
-        if (quadrant == 1 and quadrant_exp == 2) or \
-                (quadrant == 2 and quadrant_exp == 1) or \
-                (quadrant == 3 and quadrant_exp == 4) or \
-                (quadrant == 4 and quadrant_exp == 3):
-            self.inversex = True
-        elif (quadrant == 1 and quadrant_exp == 3) or \
-                (quadrant == 3 and quadrant_exp == 1) or \
-                (quadrant == 2 and quadrant_exp == 4) or \
-                (quadrant == 4 and quadrant_exp == 2):
-            self.inversey = True
-        elif (quadrant == 1 and quadrant_exp == 4) or \
-                (quadrant == 4 and quadrant_exp == 1) or \
-                (quadrant == 2 and quadrant_exp == 3) or \
-                (quadrant == 3 and quadrant_exp == 2):
-            self.swapxy = True
-        elif (quadrant == quadrant_exp):
-            self.inversex = False
-            self.inversey = False
-            self.swapxy = False
+        # Getting the keys ordered by quadrant.
+        ordered_keys = sorted(self.clicks, key=lambda k: (k[1], k[0]))
+
+        # Making the key
+        calc_key = ''
+        for key in ordered_keys:
+            x, y = self.clicks[key]
+            calc_key += '{}'.format(calc_quadrant(self.width, self.height, x,
+                                                  y))
+
+        # Getting the settings.
+        self.inversex, self.inversey, self.swapxy = calc[calc_key]
 
     def add_click(self, click):
         # This function register a new click made by user and return an error
@@ -205,7 +195,6 @@ class Calibrator:
             expected = self.points_clicked[-1]
             self.clicks[expected] = (x, y)
             self.nclicks += 1
-            self.check_axis(x, y)
         return error
 
     def get_next_point(self):
@@ -227,7 +216,8 @@ class Calibrator:
     def finish(self):
         # This function save a new axis reference and inverse the values if
         # need.
-        xinput = XInput()
+        self.check_axis()
+
         inversex = 1 if self.inversex else 0
         inversey = 1 if self.inversey else 0
         x_min = self.x_min
@@ -235,6 +225,7 @@ class Calibrator:
         y_min = self.y_min
         y_max = self.y_max
 
+        xinput = XInput()
         if self.swapxy:
             xinput.set_prop(self.device, '"Evdev Axes Swap"', '1')
             inversex, inversey = inversey, inversex
