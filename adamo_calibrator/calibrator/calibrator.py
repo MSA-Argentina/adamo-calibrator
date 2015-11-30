@@ -1,9 +1,13 @@
-from adamo_calibrator.calibrator.helpers import calc_quadrant, get_adyacent, \
-    same_axis, scale_axis
-from adamo_calibrator.calibrator.constants import calc
-from adamo_calibrator.export.xinput import XInput
+from __future__ import absolute_import
+from __future__ import print_function
+
 from random import randint
 from sys import exit
+
+from adamo_calibrator.calibrator.helpers import (calc_quadrant, get_adyacent,
+                                                 same_axis, scale_axis)
+from adamo_calibrator.calibrator.constants import calc
+from adamo_calibrator.export.xinput import XInput
 
 
 class Calibrator:
@@ -40,10 +44,10 @@ class Calibrator:
         devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                               False)
         if len(devices) == 0:
-            print "Error: No calibratable devices found."
+            print("Error: No calibratable devices found.")
             exit()
         if len(devices) > 1:
-            print "More than one devices detected. Using last."
+            print("More than one devices detected. Using last.")
 
         # Get device with format (Name, DevID, setted)
         self.device = devices[-1][1]

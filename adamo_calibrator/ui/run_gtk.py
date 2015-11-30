@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from adamo_calibrator.ui.gtk.controller import Window
 
 

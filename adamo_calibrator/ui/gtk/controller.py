@@ -1,8 +1,10 @@
+from __future__ import absolute_import
+from __future__ import print_function
 # -*- coding: utf-8 -*-
 try:
     import gtk
 except ImportError:
-    print "You don't have GTK installed"
+    print("You don't have GTK installed")
 import pygtk
 pygtk.require('2.0')
 
@@ -72,7 +74,8 @@ class Window():
 
         gtk.main()
 
-    def draw_pointer(self, (centerx, centery)):
+    def draw_pointer(self, point):
+        (centerx, centery) = point
         drawable = self.drawable
         gc = self.gc
 
@@ -121,18 +124,18 @@ class Window():
                 if error is None:
                     msg = _("valid_click_detected")
                     if DEBUG:
-                        print msg, data
+                        print(msg, data)
                     self.next = self.calibrator.get_next_point()
                     self.status = ('calibrating', None)
                 elif error == 'misclick':
                     msg = _("misclick_detected")
                     if DEBUG:
-                        print msg, data
+                        print(msg, data)
                     self.error(msg)
                 elif error == 'doubleclick':
                     msg = _("doubleclick_detected")
                     if DEBUG:
-                        print msg, data
+                        print(msg, data)
                     self.error(msg)
             elif status == 'finish':
                 quit()

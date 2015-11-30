@@ -11,7 +11,7 @@ except ImportError:
 
 setup(
     name='adamo_calibrator',
-    version='0.0.11',
+    version='0.1.0',
     author='Nicolas Illia',
     author_email='nillia@msa.com.ar',
     packages=['adamo_calibrator'],

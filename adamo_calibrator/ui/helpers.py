@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from gettext import translation
 
 from os.path import join

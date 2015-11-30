@@ -14,6 +14,9 @@
 
 
 """
+from __future__ import print_function
+from __future__ import absolute_import
+from six.moves import range
 
 
 def distinct(a, b, c, d):
@@ -43,7 +46,7 @@ def swapxy(m):
 
 def get_cases(n):
     cases = []
-    items = range(n)
+    items = list(range(n))
     for a in items:
         for b in items:
             for c in items:
@@ -76,6 +79,6 @@ def main():
             for mod in mods:
                 m = mod(m)
             if m == perfect:
-                print printable(case), [m.__name__ for m in mods]
+                print(printable(case), [m.__name__ for m in mods])
 
 main()
