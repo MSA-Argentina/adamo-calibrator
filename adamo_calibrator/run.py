@@ -37,7 +37,7 @@ if args.list:
     from adamo_calibrator.export.xinput import XInput
     devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                           id_only=False)
-    print "Devices:"
+    print("Devices:")
     for name, id, setted in devices:
         print("\tId: {0:2}\tName: {1}".format(id, name))
     quit()

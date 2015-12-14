@@ -1,6 +1,11 @@
-from zaguan import gtk
-import os
-import urllib
+from os.path import join, split
+
+from gi.repository import Gtk, Gdk
+
+try:
+    from urllib.request import pathname2url
+except ImportError:
+    from urllib import pathname2url
 
 from time import sleep
 from zaguan import Zaguan
@@ -11,11 +16,11 @@ from adamo_calibrator.settings import FULLSCREEN
 class Window(Zaguan):
 
     def run_gtk(self, settings=None, window=None, debug=False):
-        gtk.gdk.threads_init()
+        Gdk.threads_init()
 
         if window is None:
-            self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-            self.window.set_position(gtk.WIN_POS_CENTER_ALWAYS)
+            self.window = Gtk.Window(Gtk.WINDOW_TOPLEVEL)
+            self.window.set_position(Gtk.WIN_POS_CENTER_ALWAYS)
         else:
             self.window = window
 
@@ -29,7 +34,7 @@ class Window(Zaguan):
         self.window.show()
         if FULLSCREEN:
             self.window.fullscreen()
-        gtk.main()
+        Gtk.main()
 
 
 def run_web(fake, device, misclick_threshold, dualclick_threshold,
@@ -38,9 +43,8 @@ def run_web(fake, device, misclick_threshold, dualclick_threshold,
                                       dualclick_threshold, finger_delta,
                                       timeout, fast_start, auto_close,
                                       resources_path)
-    #file_ = os.path.join(resources_path, 'theme/index.html')
-    file_ = os.path.join(os.path.split(__file__)[0], 'web/html/index.html')
-    uri = 'file://' + urllib.pathname2url(file_)
+    file_ = join(split(__file__)[0], 'web/html/index.html')
+    uri = 'file://' + pathname2url(file_)
     zaguan = Window(uri, controller)
     zaguan.run()
 

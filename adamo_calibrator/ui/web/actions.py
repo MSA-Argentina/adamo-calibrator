@@ -17,4 +17,4 @@ class CalibratorControllerActions(BaseActionController):
     def log(self, data):
         """Action executed when 'log' is called and debug is True."""
         if DEBUG:
-            print "LOG >>>", data
+            print("LOG >>>", data)

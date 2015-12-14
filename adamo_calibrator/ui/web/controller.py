@@ -6,7 +6,6 @@ from adamo_calibrator.ui.web.actions import CalibratorControllerActions
 from adamo_calibrator.calibrator.calibrator import Calibrator
 from adamo_calibrator.settings import NPOINTS, SHOW_CURSOR
 from adamo_calibrator.ui.helpers import load_locales
-#from adamo_calibrator.ui.web.helpers import get_base_data
 
 
 def get_base_data(timeout):
@@ -52,7 +51,7 @@ class CalibratorController(WebContainerController):
         width = data[0]
         height = data[1]
         self.calibrator.set_screen_prop(width, height)
-        print "Screen resolution: ", width, 'x', height
+        print("Screen resolution: ", width, 'x', height)
 
         data = {}
         next = None
@@ -93,11 +92,13 @@ class CalibratorController(WebContainerController):
         next = self.calibrator.get_next_point()
         self.send_command('move_pointer', next)
 
-    def _check_last_click(self, (x, y)):
+    def _check_last_click(self, data):
         # Este metodo comprueba si el último click coincide con el centro de la
         # pantalla, en el caso de que no coincida, reinicia el proceso de
         # calibración ya que considera de que la pantalla no está correctamemte
         # calibrada
+
+        x, y = data
         recalibrate = False
         misclick_threshold = 16
         if abs(self.verification_point[0] - x) > misclick_threshold or \
@@ -119,7 +120,7 @@ class CalibratorController(WebContainerController):
         elif state == 'calibrating':
             error = self.calibrator.add_click(data)
             if error is None:
-                print _("valid_click_detected"), data
+                print(_("valid_click_detected"), data)
                 next = self.calibrator.get_next_point()
                 if next is None:
                     self.finish()
@@ -129,20 +130,20 @@ class CalibratorController(WebContainerController):
                 self.nerror += 1
                 if self.nerror >= 3:
                     self.reset()
-                print _("misclick_detected"), data
+                print(_("misclick_detected"), data)
                 self.send_command('error', error)
             elif error == 'doubleclick':
                 self.nerror += 1
                 if self.nerror >= 3:
                     self.reset()
-                print _("doubleclick_detected"), data
+                print(_("doubleclick_detected"), data)
                 self.send_command('error', error)
         elif state == 'end':
             if self._check_last_click(data):
-                print "Reset", data
+                print("Reset", data)
                 self.reset()
             else:
-                print "Close"
+                print("Close")
                 self.quit(data)
 
     def quit(self, data):

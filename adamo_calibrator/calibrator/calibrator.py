@@ -40,10 +40,10 @@ class Calibrator:
         devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                               False)
         if len(devices) == 0:
-            print "Error: No calibratable devices found."
+            print("Error: No calibratable devices found.")
             exit()
         if len(devices) > 1:
-            print "More than one devices detected. Using last."
+            print("More than one devices detected. Using last.")
 
         # Get device with format (Name, DevID, setted)
         self.device = devices[-1][1]

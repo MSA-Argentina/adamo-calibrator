@@ -18,7 +18,8 @@ def calc_quadrant(w, h, x, y):
     return quadrant
 
 
-def get_adyacent((x, y), points):
+def get_adyacent(data, points):
+    x, y = data
     adyacents = []
     for point in points:
         if x == point[0] or y == point[1]:

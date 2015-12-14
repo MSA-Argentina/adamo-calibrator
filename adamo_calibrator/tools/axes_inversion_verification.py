@@ -76,6 +76,6 @@ def main():
             for mod in mods:
                 m = mod(m)
             if m == perfect:
-                print printable(case), [m.__name__ for m in mods]
+                print(printable(case), [m.__name__ for m in mods])
 
 main()
