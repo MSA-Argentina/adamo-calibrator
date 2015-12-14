@@ -19,8 +19,8 @@ class Window(Zaguan):
         Gdk.threads_init()
 
         if window is None:
-            self.window = Gtk.Window(Gtk.WINDOW_TOPLEVEL)
-            self.window.set_position(Gtk.WIN_POS_CENTER_ALWAYS)
+            self.window = Gtk.Window(Gtk.WindowType.TOPLEVEL)
+            self.window.set_position(Gtk.WindowPosition.CENTER_ALWAYS)
         else:
             self.window = window
 
