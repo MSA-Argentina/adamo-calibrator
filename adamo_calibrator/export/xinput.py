@@ -13,7 +13,7 @@ class XInput(object):
         stdout = proc.read()
         dev_ids = stdout.split('\n')[0:-1]
 
-        #Searching Virtual core keboard.
+        # Searching Virtual core keboard.
         idx = dev_ids.index('3')
         dev_ids = dev_ids[:idx]
         if not id_only:

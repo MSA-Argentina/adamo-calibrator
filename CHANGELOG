@@ -34,3 +34,7 @@ Adding compatibility.
 
 0.0.11
 New quadrant calculation.
+
+0.1.0
+Adding Python3 Compatibility
+Upgrading GTK2 to GTK3
