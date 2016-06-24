@@ -11,7 +11,7 @@ except ImportError:
 
 setup(
     name='adamo_calibrator',
-    version='0.1.1',
+    version='0.1.2',
     author='Nicolas Illia',
     author_email='nillia@msa.com.ar',
     packages=['adamo_calibrator'],
@@ -23,6 +23,6 @@ setup(
     long_description=open('README.txt').read(),
     install_requires=["zaguan"],
     entry_points={
-        'console_scripts': ['adamo-calibrator = adamo_calibrator.run']
+        'console_scripts': ['adamo-calibrator = adamo_calibrator:run']
     },
 )
