@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from random import randint
+from sys import exit
 from zaguan.actions import BaseActionController
 from zaguan.controller import WebContainerController
 
@@ -9,7 +10,7 @@ from calibrator import Calibrator
 from helpers import load_locales
 from settings import (
     NPOINTS, SHOW_CURSOR, DEBUG, RESOURCES_PATH, MISCLICK_THRESHOLD,
-    DUALCLICK_THRESHOLD, TIMEOUT, FINGER_DELTA)
+    DUALCLICK_THRESHOLD, TIMEOUT)
 
 
 def get_base_data(timeout):
@@ -30,7 +31,7 @@ def get_base_data(timeout):
 
 
 class CalibratorControllerActions(BaseActionController):
-    """Actions for calibrator controller"""
+    """Actions for controller of Calibrator's UI"""
 
     def initiate(self, data):
         self.controller.initiate(data)
@@ -48,8 +49,12 @@ class CalibratorControllerActions(BaseActionController):
 
 
 class CalibratorController(WebContainerController):
+    """ Controller of Calibrator's UI """
 
     def __init__(self, fake, device, fast_start, auto_close):
+        """ Controller constructor
+        """
+
         WebContainerController.__init__(self)
         instance = CalibratorControllerActions(controller=self)
 
@@ -58,8 +63,7 @@ class CalibratorController(WebContainerController):
         self.add_processor("calibrator", instance)
 
         self.calibrator = Calibrator(
-            NPOINTS, MISCLICK_THRESHOLD, DUALCLICK_THRESHOLD, FINGER_DELTA,
-            device, fake)
+            NPOINTS, MISCLICK_THRESHOLD, DUALCLICK_THRESHOLD, device, fake)
 
         self.fast_start = fast_start
         self.auto_close = auto_close
@@ -67,6 +71,8 @@ class CalibratorController(WebContainerController):
         self.nerror = 0
 
     def initiate(self, data):
+        """ Initialization of the calibration data with screen properties.
+        """
         width = data[0]
         height = data[1]
         self.calibrator.set_screen_prop(width, height)
@@ -93,12 +99,16 @@ class CalibratorController(WebContainerController):
         self.send_command('ready', data)
 
     def finish(self):
+        """ End of calibration process
+        """
+
         self.state = 'end'
         self.send_command('end')
-        self.calibrator.calc_new_axis()
         self.calibrator.finish()
 
     def reset(self):
+        """ Reset calibration process
+        """
         self.state = 'calibrating'
         self.nerror = 0
         self.calibrator.reset()
@@ -112,10 +122,10 @@ class CalibratorController(WebContainerController):
         self.send_command('move_pointer', next)
 
     def _check_last_click(self, data):
-        # Este metodo comprueba si el último click coincide con el centro de la
-        # pantalla, en el caso de que no coincida, reinicia el proceso de
-        # calibración ya que considera de que la pantalla no está correctamemte
-        # calibrada
+        """ Checks the verification point to take the desition to restart the
+            calibration.
+        """
+
         (x, y) = data
         recalibrate = False
         misclick_threshold = 16
@@ -126,10 +136,16 @@ class CalibratorController(WebContainerController):
         return recalibrate
 
     def _calc_verification_point(self, width, height):
+        """ Calculates the position of the verification point
+        """
+
         self.verification_point = (randint(width / 2 - 100, width / 2 + 100),
                                    randint(height / 2, height / 2 + 100))
 
     def register_click(self, data):
+        """ Records the click's data sent by the frontend
+        """
+
         state = self.state
         if state == 'init':
             self.state = 'calibrating'
@@ -165,4 +181,7 @@ class CalibratorController(WebContainerController):
                 self.quit(data)
 
     def quit(self, data):
-        quit()
+        """ Exit function.
+        """
+
+        exit()
