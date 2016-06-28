@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import glob
-
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -11,7 +9,7 @@ except ImportError:
 
 setup(
     name='adamo_calibrator',
-    version='0.1.2',
+    version='0.2.0',
     author='Nicolas Illia',
     author_email='nillia@msa.com.ar',
     packages=['adamo_calibrator'],
