@@ -10,24 +10,34 @@ from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
 
 
 class Calibrator:
+    """ Calibrator main class """
 
     def __init__(self, npoints, threshold_misclick, threshold_doubleclick,
-                 delta_f, device=None, fake=False):
+                 device=None, fake=False):
+        """ Constructor """
+
+        # Screen properties
         self.width = None
         self.height = None
 
+        # Clicks configurations
         self.npoints = npoints
         self.threshold_misclick = threshold_misclick
         self.threshold_doubleclick = threshold_doubleclick
-
         self.blocks = 8
+
+        # Calibration data
         self.nclicks = 0
         self.clicks = {}
         self.points = []
         self.points_clicked = []
+
+        # Calibration actions
         self.swapxy = False
         self.inversex = False
         self.inversey = False
+
+        # Getting device base properties
         if fake:
             self.device = 'fake'
             self.old_prop_value = [0, 1000, 0, 1000]
@@ -38,8 +48,10 @@ class Calibrator:
             self.get_device()
 
     def get_device(self):
-        # This function loads an calibratable device from xinput, if detect
-        # more than one device, this select the first.
+        """ Loads a calibratable device from XInput.
+            In case of more than one devices are connected on the computer,
+            this'll select the last one.
+        """
         devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                               False)
         if len(devices) == 0:
@@ -53,16 +65,14 @@ class Calibrator:
         self.get_device_prop_range()
         # This reset calibration to defaults values because recalibration
         # errors
-        self.reset_calibration()
+        self.reset_device_calibration()
 
     def get_device_prop_range(self):
+        """ Get the value range of the calibration property of the device.
+        """
         self.old_prop_value = XInput.get_prop_range(self.device)
 
-    def reset_calibration(self):
-        self.swapxy = False
-        self.inversex = False
-        self.inversey = False
-
+    def reset_device_calibration(self):
         XInput.set_prop(self.device, '"Evdev Axes Swap"', '0')
         XInput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
         XInput.set_prop(self.device, '"Evdev Axis Calibration"',
@@ -73,8 +83,9 @@ class Calibrator:
                             int(float(self.old_prop_value[3]))))
 
     def set_screen_prop(self, width, height):
-        # This function set the screen width and height and realize some
-        # calcules respecting of points and the separation between this
+        """ Set the screen width and height and get calculated points and the
+            respective separation between them.
+        """
         self.width = width
         self.height = height
 
@@ -87,35 +98,45 @@ class Calibrator:
                        (block_x * 7, block_y * 7)]
 
     def calc_new_axis(self):
-        # This function calcules a new axis of references, based on clicks and
-        # old axis references witch uses in a transform with new axis
+        """ Get the new calculated axis.
+            This is done using the old axis data and clicks made in the
+            calibration process.
+        """
+
+        # Screen properties
         width = self.width
         height = self.height
 
+        # Old calibration data
         old_xmin = int(float(self.old_prop_value[0]))
         old_xmax = int(float(self.old_prop_value[1]))
         old_ymin = int(float(self.old_prop_value[2]))
         old_ymax = int(float(self.old_prop_value[3]))
 
+        # Processing clicks data
         clicks = self.clicks
         clicks_x = [clicks[x, y][0] for x, y in clicks]
         clicks_y = [clicks[x, y][1] for x, y in clicks]
         clicks_x.sort()
         clicks_y.sort()
 
+        # Verifying the axes corresponding
         x_min = float(clicks_x[0] + clicks_x[1])/2
         x_max = float(clicks_x[2] + clicks_x[3])/2
         y_min = float(clicks_y[0] + clicks_y[1])/2
         y_max = float(clicks_y[2] + clicks_y[3])/2
 
+        # Swapping axes if necessary
         if (abs(clicks_x[0] - clicks_x[3]) < abs(clicks_y[0] - clicks_y[3])):
             self.swapxy = not(self.swapxy)
             x_min, y_min = y_min, x_min
             x_max, y_max = y_max, x_max
 
+        # Calculating separation of dot axes
         block_x = float(width) / self.blocks
         block_y = float(height) / self.blocks
 
+        # Calculating the new calibration data
         scale_x = (x_max - x_min) / (width - 2 * block_x)
         x_min -= block_x * scale_x
         x_max += block_x * scale_x
@@ -129,7 +150,8 @@ class Calibrator:
         self.y_max = scale_axis(y_max, old_ymax, old_ymin, height, 0)
 
     def doubleclick(self, x, y):
-        # This function detects if a doubleclick was made
+        """ Detects if a doubleclick was made based in a threshold.
+        """
         doubleclick = False
         clicks = self.clicks
         for key in clicks:
@@ -140,7 +162,8 @@ class Calibrator:
         return doubleclick
 
     def misclick(self, x, y):
-        # This function detects if a misclick was made.
+        """ Detects if a misclick was made based in a threshold.
+        """
         nclicks = self.nclicks
         threshold = self.threshold_misclick
         misclick = False
@@ -159,19 +182,26 @@ class Calibrator:
         return misclick
 
     def reset(self):
-        self.reset_calibration()
-        width = self.width
-        height = self.height
+        """ Reset all calibration data
+        """
+        # Resetting calibration data
+        self.nclicks = 0
         self.clicks = {}
         self.points = []
         self.points_clicked = []
-        self.nclicks = 0
-        self.set_screen_prop(width, height)
+
+        # Resetting calibration actions
+        self.swapxy = False
+        self.inversex = False
+        self.inversey = False
+
+        self.reset_device_calibration()
+        self.set_screen_prop(self.width, self.height)
 
     def check_axis(self):
-        # This function checks if a inversion of axis or swapping of axis is
-        # needed.
-        # Getting the keys ordered by quadrant.
+        """ Checks if a inversion of axis or swapping of axis is needed.
+            Getting the keys ordered by quadrant.
+        """
         ordered_keys = sorted(self.clicks, key=lambda k: (k[1], k[0]))
 
         # Making the key
@@ -185,8 +215,10 @@ class Calibrator:
         self.inversex, self.inversey, self.swapxy = calc[calc_key]
 
     def add_click(self, click):
-        # This function register a new click made by user and return an error
-        # if it's need
+        """ Register a new click made by user and return an error
+            if it's need.
+        """
+
         (x, y) = click
         error = None
         if self.doubleclick(x, y):
@@ -200,7 +232,9 @@ class Calibrator:
         return error
 
     def get_next_point(self):
-        # This function returns the next point if is available
+        """ Returns the next point if is available.
+        """
+
         if len(self.points) > 0:
             if len(self.points_clicked) == 0:
                 point = self.points.pop(randint(0, len(self.points) - 1))
@@ -216,8 +250,9 @@ class Calibrator:
         return point
 
     def finish(self):
-        # This function save a new axis reference and inverse the values if
-        # need.
+        """ Save a new axis reference.
+        """
+
         self.check_axis()
 
         inversex = 1 if self.inversex else 0
@@ -227,16 +262,15 @@ class Calibrator:
         y_min = self.y_min
         y_max = self.y_max
 
-        xinput = XInput()
         if self.swapxy:
-            xinput.set_prop(self.device, '"Evdev Axes Swap"', '1')
+            XInput.set_prop(self.device, '"Evdev Axes Swap"', '1')
             inversex, inversey = inversey, inversex
             x_min, y_min = y_min, x_min
             x_max, y_max = y_max, x_max
 
         if self.inversex or self.inversey:
-            xinput.set_prop(self.device, '"Evdev Axis Inversion"',
+            XInput.set_prop(self.device, '"Evdev Axis Inversion"',
                             '{0}, {1}'.format(inversex, inversey))
-        xinput.set_prop(self.device, '"Evdev Axis Calibration"',
+        XInput.set_prop(self.device, '"Evdev Axis Calibration"',
                         '{0} {1} {2} {3}'.format(x_min, x_max,
                                                  y_min, y_max))
