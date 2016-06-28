@@ -55,7 +55,7 @@ class Calibrator:
 
         devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                               False)
-        if devices:
+        if not devices:
             print("Error: No calibratable devices found.")
             exit()
         elif len(devices) > 1:
