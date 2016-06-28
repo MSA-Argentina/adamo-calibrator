@@ -63,10 +63,9 @@ class Calibrator:
         self.inversex = False
         self.inversey = False
 
-        xinput = XInput()
-        xinput.set_prop(self.device, '"Evdev Axes Swap"', '0')
-        xinput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
-        xinput.set_prop(self.device, '"Evdev Axis Calibration"',
+        XInput.set_prop(self.device, '"Evdev Axes Swap"', '0')
+        XInput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
+        XInput.set_prop(self.device, '"Evdev Axis Calibration"',
                         '{0} {1} {2} {3}'.format(
                             int(float(self.old_prop_value[0])),
                             int(float(self.old_prop_value[1])),

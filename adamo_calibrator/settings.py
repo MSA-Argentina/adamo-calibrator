@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-from os.path import join, split
+from os.path import abspath
 
 TEST = False
 FAKE = False
@@ -19,7 +19,7 @@ TIMEOUT = 0
 # Internationalization Settings
 PO_NAME = 'calibrator'
 DEFAULT_LOCALE = 'en_US'
-RESOURCES_PATH = join(split(__file__)[0], 'resources')
+RESOURCES_PATH = abspath('resources')
 
 FAST_START = True
 AUTO_CLOSE = True

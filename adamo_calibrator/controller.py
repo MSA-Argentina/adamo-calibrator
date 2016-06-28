@@ -7,7 +7,9 @@ from zaguan.controller import WebContainerController
 
 from calibrator import Calibrator
 from helpers import load_locales
-from settings import NPOINTS, SHOW_CURSOR, DEBUG
+from settings import (
+    NPOINTS, SHOW_CURSOR, DEBUG, RESOURCES_PATH, MISCLICK_THRESHOLD,
+    DUALCLICK_THRESHOLD, TIMEOUT, FINGER_DELTA)
 
 
 def get_base_data(timeout):
@@ -47,21 +49,18 @@ class CalibratorControllerActions(BaseActionController):
 
 class CalibratorController(WebContainerController):
 
-    def __init__(self, fake, device, misclick_threshold, dualclick_threshold,
-                 finger_delta, timeout, fast_start, auto_close,
-                 resources_path):
+    def __init__(self, fake, device, fast_start, auto_close):
         WebContainerController.__init__(self)
         instance = CalibratorControllerActions(controller=self)
 
-        load_locales(resources_path)
+        load_locales(RESOURCES_PATH)
 
         self.add_processor("calibrator", instance)
 
-        self.calibrator = Calibrator(NPOINTS, misclick_threshold,
-                                     dualclick_threshold, finger_delta, device,
-                                     fake)
+        self.calibrator = Calibrator(
+            NPOINTS, MISCLICK_THRESHOLD, DUALCLICK_THRESHOLD, FINGER_DELTA,
+            device, fake)
 
-        self.timeout = timeout
         self.fast_start = fast_start
         self.auto_close = auto_close
         self.state = None
@@ -83,12 +82,12 @@ class CalibratorController(WebContainerController):
         self._calc_verification_point(width, height)
 
         data['show_cursor'] = SHOW_CURSOR
-        data['timeout'] = self.timeout
+        data['timeout'] = TIMEOUT
         data['fast_start'] = self.fast_start
         data['auto_close'] = self.auto_close
         data['state'] = self.state
         data['next'] = next
-        data['locale'] = get_base_data(self.timeout)
+        data['locale'] = get_base_data(TIMEOUT)
         data['verification_point'] = self.verification_point
 
         self.send_command('ready', data)

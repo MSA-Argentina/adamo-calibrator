@@ -15,13 +15,10 @@ except ImportError:
     from urllib import pathname2url
 
 from controller import CalibratorController
-from settings import (FULLSCREEN, FAST_START, MISCLICK_THRESHOLD,
-                      DUALCLICK_THRESHOLD, TIMEOUT, FINGER_DELTA, AUTO_CLOSE,
-                      RESOURCES_PATH)
+from settings import FULLSCREEN, FAST_START, AUTO_CLOSE
 
 
 class Window(Zaguan):
-
     def run_gtk(self, settings=None, window=None, debug=False):
         Gdk.threads_init()
 
@@ -44,54 +41,42 @@ class Window(Zaguan):
         Gtk.main()
 
 
-def run(fake, device, misclick_threshold, dualclick_threshold,
-        finger_delta, timeout, fast_start, auto_close, resources_path):
-    controller = CalibratorController(fake, device, misclick_threshold,
-                                      dualclick_threshold, finger_delta,
-                                      timeout, fast_start, auto_close,
-                                      resources_path)
+def run(fake, device, fast_start, auto_close):
+    controller = CalibratorController(fake, device, fast_start, auto_close)
     file_ = abspath('resources/index.html')
     uri = 'file://' + pathname2url(file_)
     zaguan = Window(uri, controller)
     zaguan.run()
 
 
-parser = ArgumentParser()
-group_dev = parser.add_mutually_exclusive_group()
+def main():
+    parser = ArgumentParser()
+    group_dev = parser.add_mutually_exclusive_group()
 
-group_dev.add_argument('--device', type=int, metavar='dev-id', default=None,
-                       help='Set device ID manually for calibration.')
-group_dev.add_argument('--fake', action="store_true",
-                       help="Use a fake device.")
-parser.add_argument('--dualclick', type=int, metavar='threshold',
-                    default=DUALCLICK_THRESHOLD,
-                    help='Set dualclick threshold.')
-parser.add_argument('--misclick', type=int, metavar='threshold',
-                    default=MISCLICK_THRESHOLD, help='Set misclick threshold.')
-parser.add_argument('--faststart', action="store_true", default=FAST_START,
-                    help="Start calibrating.")
-parser.add_argument('--autoclose', action="store_true", default=AUTO_CLOSE,
-                    help="Close without user click.")
-parser.add_argument('-l', '--list', action="store_true",
-                    help='List calibratables devices available.')
-parser.add_argument('--timeout', type=int, metavar='milliseconds',
-                    default=TIMEOUT,
-                    help='Set timeout in milliseconds. (0 for disable)')
-parser.add_argument('--resources-path', metavar='path',
-                    default=RESOURCES_PATH,
-                    help='Set path for custom resources (Only on web gui).')
-args = parser.parse_args()
+    group_dev.add_argument('--device', type=int, metavar='dev-id',
+                           default=None,
+                           help='Set device ID manually for calibration.')
+    group_dev.add_argument('--fake', action="store_true",
+                           help="Use a fake device.")
+    parser.add_argument('--faststart', action="store_true", default=FAST_START,
+                        help="Start calibrating.")
+    parser.add_argument('--autoclose', action="store_true", default=AUTO_CLOSE,
+                        help="Close without user click.")
+    parser.add_argument('-l', '--list', action="store_true",
+                        help='List calibratables devices available.')
+    args = parser.parse_args()
 
-if args.list:
-    from adamo_calibrator.export.xinput import XInput
-    devices = XInput.get_device_with_prop('Evdev Axis Calibration',
-                                          id_only=False)
-    print("Devices:")
-    for name, id, setted in devices:
-        print(("\tId: {0:2}\tName: {1}".format(id, name)))
+    if args.list:
+        from adamo_calibrator.export.xinput import XInput
+        devices = XInput.get_device_with_prop('Evdev Axis Calibration',
+                                              id_only=False)
+        print("Devices:")
+        for name, id, setted in devices:
+            print(("\tId: {0:2}\tName: {1}".format(id, name)))
+
+    run(fake=args.fake, device=args.device, fast_start=args.faststart,
+        auto_close=args.autoclose)
 
 
-run(fake=args.fake, device=args.device, misclick_threshold=args.misclick,
-    dualclick_threshold=args.dualclick, finger_delta=FINGER_DELTA,
-    timeout=args.timeout, fast_start=args.faststart, auto_close=args.autoclose,
-    resources_path=abspath(args.resources_path))
+if __name__ == "__main__":
+    main()
