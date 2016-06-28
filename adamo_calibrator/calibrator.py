@@ -4,10 +4,9 @@ from __future__ import print_function
 from random import randint
 from sys import exit
 
-from adamo_calibrator.calibrator.helpers import (calc_quadrant, get_adyacent,
-                                                 same_axis, scale_axis)
-from adamo_calibrator.calibrator.constants import calc
-from adamo_calibrator.export.xinput import XInput
+from constants import calc
+from export import XInput
+from helpers import calc_quadrant, get_adyacent, same_axis, scale_axis
 
 
 class Calibrator:

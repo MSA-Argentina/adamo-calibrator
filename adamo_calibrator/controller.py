@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 from __future__ import print_function
-# -*- coding: utf-8 -*-
-from random import randint
-from zaguan.controller import WebContainerController
-from adamo_calibrator.ui.web.actions import CalibratorControllerActions
 
-from adamo_calibrator.calibrator.calibrator import Calibrator
-from adamo_calibrator.settings import NPOINTS, SHOW_CURSOR
-from adamo_calibrator.ui.helpers import load_locales
+from random import randint
+from zaguan.actions import BaseActionController
+from zaguan.controller import WebContainerController
+
+from calibrator import Calibrator
+from helpers import load_locales
+from settings import NPOINTS, SHOW_CURSOR, DEBUG
 
 
 def get_base_data(timeout):
@@ -25,6 +25,24 @@ def get_base_data(timeout):
         data['calibration_msg'] += _('wait').format(max)
 
     return data
+
+
+class CalibratorControllerActions(BaseActionController):
+    """Actions for calibrator controller"""
+
+    def initiate(self, data):
+        self.controller.initiate(data)
+
+    def click(self, data):
+        self.controller.register_click(data)
+
+    def timeout(self, data):
+        self.controller.quit(data)
+
+    def log(self, data):
+        """Action executed when 'log' is called and debug is True."""
+        if DEBUG:
+            print("LOG >>>", data)
 
 
 class CalibratorController(WebContainerController):

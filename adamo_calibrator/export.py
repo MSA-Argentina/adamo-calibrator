@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from os import popen
-from adamo_calibrator.settings import FAKE, TEST
+
+from settings import FAKE, TEST
 
 
 class XInput(object):
