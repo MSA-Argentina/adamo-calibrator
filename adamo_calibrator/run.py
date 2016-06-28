@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 
 from argparse import ArgumentParser
-from os.path import abspath
+from os.path import join, split
 from time import sleep
 
 from gi.repository import Gtk, Gdk
@@ -43,7 +43,7 @@ class Window(Zaguan):
 
 def run(fake, device, fast_start, auto_close):
     controller = CalibratorController(fake, device, fast_start, auto_close)
-    file_ = abspath('resources/index.html')
+    file_ = join(split(__file__)[0], 'resources/index.html')
     uri = 'file://' + pathname2url(file_)
     zaguan = Window(uri, controller)
     zaguan.run()
