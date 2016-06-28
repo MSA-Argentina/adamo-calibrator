@@ -82,11 +82,6 @@ function end(){
 	hide_timer();
 	window.clearInterval(timeout);
 	check_calibration();
-	//if (auto_close){
-	//	timeout = setTimeout(function(){
-	//		send('timeout');
-	//	}, 3000);
-	//}
 }
 
 function error(type){
