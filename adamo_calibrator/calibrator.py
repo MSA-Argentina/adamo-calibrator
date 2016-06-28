@@ -52,13 +52,14 @@ class Calibrator:
             In case of more than one devices are connected on the computer,
             this'll select the last one.
         """
+
         devices = XInput.get_device_with_prop('Evdev Axis Calibration',
                                               False)
-        if len(devices) == 0:
+        if devices:
             print("Error: No calibratable devices found.")
             exit()
-        if len(devices) > 1:
-            print("More than one devices detected. Using last.")
+        elif len(devices) > 1:
+            print("More than one devices detected. Using lastone.")
 
         # Get device with format (Name, DevID, setted)
         self.device = devices[-1][1]
@@ -70,9 +71,13 @@ class Calibrator:
     def __get_device_prop_range(self):
         """ Get the value range of the calibration property of the device.
         """
+
         self.old_prop_value = XInput.get_prop_range(self.device)
 
     def __reset_device_calibration(self):
+        """ Reset the calibration data of the device.
+        """
+
         XInput.set_prop(self.device, '"Evdev Axes Swap"', '0')
         XInput.set_prop(self.device, '"Evdev Axis Inversion"', '0, 0')
         XInput.set_prop(self.device, '"Evdev Axis Calibration"',
@@ -86,6 +91,7 @@ class Calibrator:
         """ Set the screen width and height and get calculated points and the
             respective separation between them.
         """
+
         self.width = width
         self.height = height
 
@@ -100,6 +106,7 @@ class Calibrator:
     def reset(self):
         """ Reset all calibration data
         """
+
         # Resetting calibration data
         self.nclicks = 0
         self.clicks = {}
@@ -117,6 +124,7 @@ class Calibrator:
     def __doubleclick(self, x, y):
         """ Detects if a doubleclick was made based in a threshold.
         """
+
         doubleclick = False
         clicks = self.clicks
         for key in clicks:
@@ -129,6 +137,7 @@ class Calibrator:
     def __misclick(self, x, y):
         """ Detects if a misclick was made based in a threshold.
         """
+
         nclicks = self.nclicks
         threshold = self.threshold_misclick
         misclick = False
@@ -185,6 +194,7 @@ class Calibrator:
         """ Checks if a inversion of axis or swapping of axis is needed.
             Getting the keys ordered by quadrant.
         """
+
         ordered_keys = sorted(self.clicks, key=lambda k: (k[1], k[0]))
 
         # Making the key
@@ -252,6 +262,7 @@ class Calibrator:
     def finish(self):
         """ Save a new axis reference.
         """
+
         self.__calc_new_axis()
         self.__check_axis()
 
