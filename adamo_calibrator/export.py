@@ -3,7 +3,7 @@ from __future__ import print_function
 
 from os import popen
 
-from settings import FAKE, TEST
+from .settings import FAKE, TEST
 
 
 class XInput(object):

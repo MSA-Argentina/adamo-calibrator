@@ -6,9 +6,9 @@ from sys import exit
 from zaguan.actions import BaseActionController
 from zaguan.controller import WebContainerController
 
-from calibrator import Calibrator
-from helpers import load_locales
-from settings import (
+from .calibrator import Calibrator
+from .helpers import load_locales
+from .settings import (
     NPOINTS, SHOW_CURSOR, DEBUG, RESOURCES_PATH, MISCLICK_THRESHOLD,
     DUALCLICK_THRESHOLD, TIMEOUT)
 

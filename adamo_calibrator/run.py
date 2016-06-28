@@ -14,8 +14,8 @@ try:
 except ImportError:
     from urllib import pathname2url
 
-from controller import CalibratorController
-from settings import FULLSCREEN, FAST_START, AUTO_CLOSE
+from .controller import CalibratorController
+from .settings import FULLSCREEN, FAST_START, AUTO_CLOSE
 
 
 class Window(Zaguan):
